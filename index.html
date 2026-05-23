@@ -764,6 +764,7 @@
 
     const storeKey = "biomedicina-ufmg-n20262-done";
     const scheduleStoreKey = "biomedicina-ufmg-n20262-schedule";
+    const scheduleSeedKey = "biomedicina-ufmg-n20262-photo-schedule-seeded";
     const validCodes = new Set(courses.map(course => course.code));
     const days = [
       { key: "seg", label: "Seg" },
@@ -789,8 +790,54 @@
       sábado: "sab",
       sab: "sab"
     };
+    const photoOfferings = [
+      { id: "foto-p1-MOF143", code: "MOF143", label: "Foto 1 - 1º período", meetings: [{ day: "seg", start: 1140, end: 1240 }, { day: "seg", start: 1255, end: 1355 }] },
+      { id: "foto-p1-QUI204", code: "QUI204", label: "Foto 1 - 1º período", meetings: [{ day: "ter", start: 1140, end: 1240 }] },
+      { id: "foto-p1-QUI203", code: "QUI203", label: "Foto 1 - 1º período", meetings: [{ day: "ter", start: 1255, end: 1355 }, { day: "qui", start: 1140, end: 1240 }] },
+      { id: "foto-p1-MOF009", code: "MOF009", label: "Foto 1 - 1º período", meetings: [{ day: "qua", start: 1140, end: 1240 }, { day: "qua", start: 1255, end: 1355 }] },
+      { id: "foto-p1-ACT080", code: "ACT080", label: "Foto 1 - 1º período", meetings: [{ day: "qui", start: 1255, end: 1355 }] },
+      { id: "foto-p1-EST083", code: "EST083", label: "Foto 1 - 1º período", meetings: [{ day: "sex", start: 1140, end: 1240 }] },
+
+      { id: "foto-p2-BIQ050", code: "BIQ050", label: "Foto 1 - 2º período", meetings: [{ day: "seg", start: 1190, end: 1240 }, { day: "seg", start: 1255, end: 1355 }, { day: "sex", start: 1255, end: 1355 }] },
+      { id: "foto-p2-BIG157", code: "BIG157", label: "Foto 1 - 2º período", meetings: [{ day: "ter", start: 1140, end: 1240 }, { day: "ter", start: 1255, end: 1305 }] },
+      { id: "foto-p2-MOF008", code: "MOF008", label: "Foto 1 - 2º período", meetings: [{ day: "qua", start: 1140, end: 1240 }] },
+      { id: "foto-p2-BIQ602", code: "BIQ602", label: "Foto 1 - 2º período", meetings: [{ day: "qui", start: 1140, end: 1240 }, { day: "qui", start: 1255, end: 1305 }] },
+      { id: "foto-p2-FIB618", code: "FIB618", label: "Foto 1 - 2º período", meetings: [{ day: "sex", start: 1140, end: 1240 }] },
+
+      { id: "foto-p3-QUI095", code: "QUI095", label: "Foto 1 - 3º período", meetings: [{ day: "ter", start: 1140, end: 1240 }, { day: "qua", start: 1140, end: 1240 }] },
+      { id: "foto-p3-QUI297", code: "QUI297", label: "Foto 1 - 3º período", meetings: [{ day: "qua", start: 1255, end: 1355 }] },
+      { id: "foto-p3-QUI298", code: "QUI298", label: "Foto 1 - 3º período", meetings: [{ day: "ter", start: 1255, end: 1355 }, { day: "sex", start: 1140, end: 1240 }] },
+      { id: "foto-p3-FIB619", code: "FIB619", label: "Foto 1 - 3º período", meetings: [{ day: "qui", start: 1140, end: 1240 }, { day: "qui", start: 1255, end: 1355 }, { day: "seg", start: 1255, end: 1355 }] },
+
+      { id: "foto-p4-FAR122", code: "FAR122", label: "Foto 1 - 4º período", meetings: [{ day: "seg", start: 1140, end: 1240 }, { day: "seg", start: 1255, end: 1355 }] },
+      { id: "foto-p4-PAG011", code: "PAG011", label: "Foto 1 - 4º período", meetings: [{ day: "ter", start: 1140, end: 1240 }, { day: "qua", start: 1140, end: 1240 }, { day: "qua", start: 1255, end: 1355 }] },
+      { id: "foto-p4-BIQ058", code: "BIQ058", label: "Foto 1 - 4º período", meetings: [{ day: "ter", start: 1255, end: 1355 }] },
+      { id: "foto-p4-MIC123", code: "MIC123", label: "Foto 1 - 4º período", meetings: [{ day: "qui", start: 1140, end: 1240 }, { day: "qui", start: 1255, end: 1355 }] },
+      { id: "foto-p4-PAR106", code: "PAR106", label: "Foto 1 - 4º período", meetings: [{ day: "sex", start: 1140, end: 1240 }, { day: "sex", start: 1255, end: 1355 }] },
+
+      { id: "foto-p5-ACT140", code: "ACT140", label: "Foto 1 - 5º período", meetings: [{ day: "seg", start: 1140, end: 1240 }, { day: "seg", start: 1255, end: 1355 }, { day: "sex", start: 1140, end: 1240 }, { day: "sex", start: 1255, end: 1355 }] },
+      { id: "foto-p5-ACT017", code: "ACT017", label: "Foto 1 - 5º período", meetings: [{ day: "ter", start: 1140, end: 1240 }, { day: "ter", start: 1255, end: 1355 }] },
+      { id: "foto-p5-ACT605", code: "ACT605", label: "Foto 1 - 5º período", meetings: [{ day: "qua", start: 1140, end: 1240 }, { day: "qui", start: 1140, end: 1240 }, { day: "qui", start: 1255, end: 1355 }] },
+      { id: "foto-p5-ACT026", code: "ACT026", label: "Foto 1 - 5º período", meetings: [{ day: "qua", start: 1255, end: 1355 }] },
+
+      { id: "foto-p6-ACT142", code: "ACT142", label: "Foto 2 - 6º período", meetings: [{ day: "seg", start: 1140, end: 1240 }, { day: "seg", start: 1255, end: 1355 }, { day: "qui", start: 1140, end: 1240 }, { day: "qui", start: 1255, end: 1305 }] },
+      { id: "foto-p6-ACT141", code: "ACT141", label: "Foto 2 - 6º período", meetings: [{ day: "seg", start: 1255, end: 1355 }, { day: "sex", start: 1140, end: 1240 }, { day: "sex", start: 1255, end: 1305 }] },
+      { id: "foto-p6-ACT081", code: "ACT081", label: "Foto 2 - 6º período", meetings: [{ day: "ter", start: 1140, end: 1240 }, { day: "ter", start: 1255, end: 1355 }] },
+      { id: "foto-p6-FAS135", code: "FAS135", label: "Foto 2 - 6º período", meetings: [{ day: "qua", start: 1140, end: 1240 }] },
+
+      { id: "foto-p7-ACT045", code: "ACT045", label: "Foto 2 - 7º período", meetings: [{ day: "seg", start: 1140, end: 1240 }, { day: "seg", start: 1255, end: 1355 }, { day: "qua", start: 1140, end: 1240 }, { day: "qua", start: 1255, end: 1355 }, { day: "qui", start: 1140, end: 1240 }, { day: "qui", start: 1255, end: 1355 }] },
+      { id: "foto-p7-ALM139", code: "ALM139", label: "Foto 2 - 7º período", meetings: [{ day: "ter", start: 1140, end: 1240 }, { day: "ter", start: 1255, end: 1355 }] },
+      { id: "foto-p7-ACT143", code: "ACT143", label: "Foto 2 - 7º período", meetings: [{ day: "qua", start: 1140, end: 1240 }, { day: "qui", start: 1140, end: 1240 }, { day: "qui", start: 1255, end: 1355 }] },
+      { id: "foto-p7-FAS012", code: "FAS012", label: "Foto 2 - 7º período", meetings: [{ day: "sex", start: 1140, end: 1240 }] },
+
+      { id: "foto-p8-ACT602", code: "ACT602", label: "Foto 2 - 8º período", meetings: [{ day: "seg", start: 1140, end: 1240 }, { day: "seg", start: 1255, end: 1355 }, { day: "qua", start: 1255, end: 1355 }] },
+      { id: "foto-p8-ACT016", code: "ACT016", label: "Foto 2 - 8º período", meetings: [{ day: "ter", start: 1140, end: 1240 }, { day: "ter", start: 1255, end: 1355 }] },
+      { id: "foto-p8-ACT018", code: "ACT018", label: "Foto 2 - 8º período", meetings: [{ day: "qua", start: 1140, end: 1240 }] },
+      { id: "foto-p8-ACT072", code: "ACT072", label: "Foto 2 - 8º período", meetings: [{ day: "qui", start: 1140, end: 1305 }] },
+      { id: "foto-p8-ACT082", code: "ACT082", label: "Foto 2 - 8º período", meetings: [{ day: "sex", start: 1140, end: 1240 }] }
+    ];
     let done = new Set(readInitialProgress());
-    let schedule = readSchedule();
+    let schedule = seedPhotoSchedule(readSchedule());
 
     const byCode = Object.fromEntries(courses.map(course => [course.code, course]));
 
@@ -857,6 +904,20 @@
       const selectedIds = new Set(schedule.offerings.map(offering => offering.id));
       schedule.selected = schedule.selected.filter(id => selectedIds.has(id));
       localStorage.setItem(scheduleStoreKey, JSON.stringify(schedule));
+    }
+
+    function seedPhotoSchedule(currentSchedule) {
+      if (localStorage.getItem(scheduleSeedKey)) return currentSchedule;
+
+      const existingIds = new Set(currentSchedule.offerings.map(offering => offering.id));
+      const additions = photoOfferings.filter(offering => !existingIds.has(offering.id));
+      const seeded = {
+        offerings: [...currentSchedule.offerings, ...additions],
+        selected: currentSchedule.selected
+      };
+      localStorage.setItem(scheduleSeedKey, "1");
+      localStorage.setItem(scheduleStoreKey, JSON.stringify(seeded));
+      return seeded;
     }
 
     function setStatus(message) {
