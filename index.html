@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biomedicina UFMG - Matriz N-20262</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f4ef;
+      --panel: #ffffff;
+      --ink: #202124;
+      --muted: #666b73;
+      --line: #d7d2c7;
+      --blue: #2f6f9f;
+      --green: #3f7d58;
+      --orange: #b9652b;
+      --red: #b94a48;
+      --shadow: 0 10px 25px rgba(32, 33, 36, .08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.4;
+    }
+
+    header {
+      padding: 28px clamp(16px, 3vw, 36px) 18px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfaf7;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(24px, 4vw, 42px);
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      max-width: 900px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      align-items: center;
+    }
+
+    button,
+    .select {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 6px;
+      min-height: 38px;
+      padding: 8px 12px;
+      font: inherit;
+      box-shadow: 0 1px 0 rgba(32, 33, 36, .04);
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:hover { border-color: #a9a397; }
+
+    main {
+      padding: 22px clamp(16px, 3vw, 36px) 44px;
+      display: grid;
+      gap: 22px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 24px;
+      margin-bottom: 2px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .progress {
+      height: 9px;
+      background: #e7e1d6;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress > div {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--green), var(--blue));
+      transition: width .2s ease;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .periods {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(220px, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+
+    section,
+    aside {
+      min-width: 0;
+    }
+
+    .period {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: clip;
+      box-shadow: var(--shadow);
+    }
+
+    .period-header {
+      padding: 12px 13px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+      background: #fdfbf7;
+    }
+
+    .period-header h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .period-header span {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .course {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 8px;
+      padding: 11px 12px;
+      border-bottom: 1px solid #ece8df;
+      min-height: 86px;
+    }
+
+    .course:last-child { border-bottom: 0; }
+
+    .course.blocked {
+      background: #fff8f2;
+      border-left: 3px solid var(--orange);
+      padding-left: 9px;
+    }
+
+    .course.done {
+      background: #f3faf5;
+      color: #405246;
+    }
+
+    .course input {
+      inline-size: 18px;
+      block-size: 18px;
+      margin-top: 2px;
+      accent-color: var(--green);
+    }
+
+    .code {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #eef3f7;
+      color: #204e73;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .course h3 {
+      font-size: 14px;
+      margin: 0 0 7px;
+      line-height: 1.22;
+      letter-spacing: 0;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .pill {
+      border: 1px solid #ded8cc;
+      border-radius: 999px;
+      padding: 2px 7px;
+      background: #fff;
+    }
+
+    .req {
+      margin-top: 7px;
+      color: #7a4b20;
+      font-size: 12px;
+    }
+
+    .side-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: clip;
+      position: sticky;
+      top: 142px;
+    }
+
+    .side-panel h2 {
+      margin: 0;
+      padding: 13px 14px;
+      font-size: 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fdfbf7;
+    }
+
+    .side-content {
+      padding: 13px 14px;
+      display: grid;
+      gap: 13px;
+      max-height: calc(100vh - 190px);
+      overflow: auto;
+    }
+
+    .next-list,
+    .chain-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .small-card {
+      border: 1px solid #e5dfd5;
+      border-radius: 7px;
+      padding: 9px;
+      background: #fffefa;
+      font-size: 13px;
+    }
+
+    .small-card strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+    }
+
+    .summary {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 15px;
+    }
+
+    .summary h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .summary-grid div {
+      border: 1px solid #e5dfd5;
+      border-radius: 7px;
+      padding: 10px;
+      background: #fffefa;
+    }
+
+    .summary-grid strong {
+      display: block;
+      font-size: 18px;
+    }
+
+    @media (max-width: 1500px) {
+      .periods { grid-template-columns: repeat(4, minmax(220px, 1fr)); }
+    }
+
+    @media (max-width: 1180px) {
+      .layout { grid-template-columns: 1fr; }
+      .side-panel { position: static; }
+      .side-content { max-height: none; }
+      .periods { grid-template-columns: repeat(3, minmax(220px, 1fr)); }
+    }
+
+    @media (max-width: 820px) {
+      header { position: static; }
+      .stats,
+      .summary-grid,
+      .periods { grid-template-columns: 1fr; }
+      .toolbar { align-items: stretch; }
+      button,
+      .select { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Biomedicina UFMG</h1>
+    <p class="subtitle">Visualização da matriz curricular N-20262, percurso padrão 01-01. Marque disciplinas concluídas para ver progresso, bloqueios e próximas matérias possíveis.</p>
+    <div class="toolbar">
+      <select class="select" id="filter">
+        <option value="all">Mostrar todas</option>
+        <option value="open">Só liberadas</option>
+        <option value="blocked">Só bloqueadas</option>
+        <option value="pending">Só pendentes</option>
+        <option value="done">Só concluídas</option>
+      </select>
+      <button id="mark-period">Marcar período selecionado</button>
+      <select class="select" id="period-select" aria-label="Período">
+        <option value="1">1º período</option>
+        <option value="2">2º período</option>
+        <option value="3">3º período</option>
+        <option value="4">4º período</option>
+        <option value="5">5º período</option>
+        <option value="6">6º período</option>
+        <option value="7">7º período</option>
+        <option value="8">8º período</option>
+        <option value="9">9º período</option>
+        <option value="10">10º período</option>
+      </select>
+      <button id="reset">Limpar marcações</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="stats" aria-label="Resumo de progresso">
+      <div class="stat">
+        <strong id="done-count">0/40</strong>
+        <span>atividades obrigatórias concluídas</span>
+        <div class="progress"><div id="done-bar"></div></div>
+      </div>
+      <div class="stat">
+        <strong id="hours-count">0h</strong>
+        <span>carga horária obrigatória marcada</span>
+      </div>
+      <div class="stat">
+        <strong id="open-count">0</strong>
+        <span>pendentes liberadas agora</span>
+      </div>
+      <div class="stat">
+        <strong id="blocked-count">0</strong>
+        <span>pendentes com pré-requisito faltando</span>
+      </div>
+    </section>
+
+    <div class="layout">
+      <section class="periods" id="periods" aria-label="Disciplinas por período"></section>
+      <aside class="side-panel">
+        <h2>Próximas e dependências</h2>
+        <div class="side-content">
+          <div class="legend">
+            <span><i class="dot" style="background: var(--green)"></i>Concluída</span>
+            <span><i class="dot" style="background: var(--blue)"></i>Liberada</span>
+            <span><i class="dot" style="background: var(--orange)"></i>Bloqueada</span>
+          </div>
+          <div>
+            <h3 style="margin:0 0 8px;font-size:14px">Liberadas agora</h3>
+            <div class="next-list" id="next-list"></div>
+          </div>
+          <div>
+            <h3 style="margin:0 0 8px;font-size:14px">Cadeias principais</h3>
+            <div class="chain-list" id="chain-list"></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <section class="summary">
+      <h2>Integralização do percurso 01-01</h2>
+      <p class="subtitle">Resumo extraído do PDF. A visualização acima detalha as atividades obrigatórias com período sugerido; optativas e formação livre aparecem como blocos de carga horária.</p>
+      <div class="summary-grid">
+        <div><strong>1965h</strong><span>obrigatórias</span></div>
+        <div><strong>645h</strong><span>estágio obrigatório</span></div>
+        <div><strong>420h</strong><span>optativas</span></div>
+        <div><strong>180h</strong><span>formação livre</span></div>
+        <div><strong>3210h</strong><span>total mínimo</span></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const courses = [
+      { period: 1, code: "ACT080", name: "Introdução à Biomedicina", credits: 2, hours: 30, req: [] },
+      { period: 1, code: "EST083", name: "Bioestatística Básica F", credits: 2, hours: 30, req: [] },
+      { period: 1, code: "MOF009", name: "Anatomia Humana Básica", credits: 3, hours: 45, req: [] },
+      { period: 1, code: "MOF143", name: "Citologia e Histologia", credits: 4, hours: 60, req: [] },
+      { period: 1, code: "QUI203", name: "Química Geral F", credits: 4, hours: 60, req: [] },
+      { period: 1, code: "QUI204", name: "Química Geral Experimental F", credits: 2, hours: 30, req: [] },
+      { period: 2, code: "BIG157", name: "Genética F", credits: 3, hours: 45, req: [] },
+      { period: 2, code: "BIQ050", name: "Bioquímica Celular F", credits: 5, hours: 75, req: [] },
+      { period: 2, code: "BIQ602", name: "Imunologia Básica", credits: 3, hours: 45, req: ["MOF143"] },
+      { period: 2, code: "FIB618", name: "Biofísica B", credits: 2, hours: 30, req: [] },
+      { period: 2, code: "MOF008", name: "Embriologia Geral", credits: 2, hours: 30, req: [] },
+      { period: 3, code: "FIB619", name: "Fisiologia F", credits: 6, hours: 90, req: ["MOF143", "FIB618", "MOF009"] },
+      { period: 3, code: "QUI095", name: "Introdução à Química Orgânica", credits: 4, hours: 60, req: ["QUI203", "QUI204"] },
+      { period: 3, code: "QUI297", name: "Química Analítica Experimental F", credits: 2, hours: 30, req: ["QUI203", "QUI204"] },
+      { period: 3, code: "QUI298", name: "Química Analítica F", credits: 4, hours: 60, req: ["QUI203", "QUI204"] },
+      { period: 4, code: "BIQ058", name: "Biologia Molecular F", credits: 2, hours: 30, req: ["BIQ050"] },
+      { period: 4, code: "FAR122", name: "Farmacologia Básica", credits: 4, hours: 60, req: ["FIB618", "FIB619", "BIQ050"] },
+      { period: 4, code: "MIC123", name: "Microbiologia Básica", credits: 4, hours: 60, req: ["MOF143", "BIQ050"] },
+      { period: 4, code: "PAG011", name: "Patologia Geral F", credits: 6, hours: 90, req: ["BIQ602", "FIB619"] },
+      { period: 4, code: "PAR106", name: "Parasitologia Humana", credits: 4, hours: 60, req: ["MOF143", "BIQ602"] },
+      { period: 5, code: "ACT017", name: "Biologia Molecular Aplicada", credits: 3, hours: 45, req: ["BIG157", "BIQ058"] },
+      { period: 5, code: "ACT026", name: "Ética e Legislação Biomédica", credits: 2, hours: 30, req: ["ACT080"] },
+      { period: 5, code: "ACT140", name: "Bioquímica Clínica I", credits: 5, hours: 75, req: ["BIQ050"] },
+      { period: 5, code: "ACT605", name: "Imunologia Clínica", credits: 4, hours: 60, req: ["BIQ602"] },
+      { period: 6, code: "ACT081", name: "Toxicologia Ambiental", credits: 4, hours: 60, req: ["FAR122"] },
+      { period: 6, code: "ACT141", name: "Bacteriologia Clínica", credits: 5, hours: 75, req: ["MIC123"] },
+      { period: 6, code: "ACT142", name: "Bioquímica Clínica II", credits: 5, hours: 75, req: ["ACT140", "QUI095"] },
+      { period: 6, code: "FAS135", name: "Epidemiologia", credits: 2, hours: 30, req: ["EST083"] },
+      { period: 7, code: "ACT045", name: "Hematologia Clínica", credits: 7, hours: 105, req: ["FIB619"] },
+      { period: 7, code: "ACT143", name: "Parasitologia Clínica", credits: 4, hours: 60, req: ["PAR106", "ACT605"] },
+      { period: 7, code: "ALM139", name: "Métodos Analíticos Aplicados a Alimentos", credits: 4, hours: 60, req: ["QUI297", "MIC123", "QUI298"] },
+      { period: 7, code: "FAS012", name: "Políticas de Saúde", credits: 2, hours: 30, req: ["FAS135"] },
+      { period: 8, code: "ACT016", name: "Radioisótopos em Diagnóstico", credits: 3, hours: 45, req: ["QUI203"] },
+      { period: 8, code: "ACT018", name: "Gestão da Qualidade no Lab. Clínico", credits: 2, hours: 30, req: ["ACT141", "ACT142", "ACT045"] },
+      { period: 8, code: "ACT072", name: "Micologia Clínica", credits: 3, hours: 45, req: ["MIC123"] },
+      { period: 8, code: "ACT082", name: "Atividade Integradora", credits: 2, hours: 30, req: ["ACT142", "ACT045"] },
+      { period: 8, code: "ACT602", name: "Citologia Clínica", credits: 4, hours: 60, req: ["PAG011"] },
+      { period: 9, code: "ACT144", name: "Estágio em Ciências Biomédicas I", credits: 22, hours: 330, req: [], type: "Estágio" },
+      { period: 10, code: "ACT086", name: "Monografia de Conclusão de Curso", credits: 2, hours: 30, req: [] },
+      { period: 10, code: "ACT145", name: "Estágio em Ciências Biomédicas II", credits: 21, hours: 315, req: ["ACT141", "ACT142", "ACT045"], type: "Estágio" }
+    ];
+
+    const extraHours = {
+      2: "Núcleo Geral 75h",
+      3: "Núcleo Geral 60h",
+      5: "Núcleo Geral 45h + Optativas 45h",
+      6: "Optativas 60h",
+      7: "Optativas 45h",
+      8: "Optativas 90h",
+      9: "Optativas 120h",
+      10: "Optativas 60h"
+    };
+
+    const storeKey = "biomedicina-ufmg-n20262-done";
+    let done = new Set(JSON.parse(localStorage.getItem(storeKey) || "[]"));
+
+    const byCode = Object.fromEntries(courses.map(course => [course.code, course]));
+
+    function isOpen(course) {
+      return course.req.every(code => done.has(code));
+    }
+
+    function blockers(course) {
+      return course.req.filter(code => !done.has(code));
+    }
+
+    function save() {
+      localStorage.setItem(storeKey, JSON.stringify([...done]));
+    }
+
+    function render() {
+      const filter = document.getElementById("filter").value;
+      const periods = document.getElementById("periods");
+      periods.innerHTML = "";
+
+      for (let period = 1; period <= 10; period += 1) {
+        const periodCourses = courses.filter(course => course.period === period);
+        const article = document.createElement("article");
+        article.className = "period";
+        article.innerHTML = `
+          <div class="period-header">
+            <h2>${period}º período</h2>
+            <span>${periodCourses.reduce((sum, course) => sum + course.hours, 0)}h</span>
+          </div>
+        `;
+
+        periodCourses.forEach(course => {
+          const courseDone = done.has(course.code);
+          const courseOpen = isOpen(course);
+          const hidden =
+            (filter === "open" && (courseDone || !courseOpen)) ||
+            (filter === "blocked" && (courseDone || courseOpen)) ||
+            (filter === "pending" && courseDone) ||
+            (filter === "done" && !courseDone);
+
+          if (hidden) return;
+
+          const missing = blockers(course);
+          const row = document.createElement("label");
+          row.className = `course ${courseDone ? "done" : ""} ${!courseDone && !courseOpen ? "blocked" : ""}`;
+          row.innerHTML = `
+            <input type="checkbox" ${courseDone ? "checked" : ""} data-code="${course.code}">
+            <div>
+              <span class="code">${course.code}</span>
+              <h3>${course.name}</h3>
+              <div class="meta">
+                <span class="pill">${course.credits} cr.</span>
+                <span class="pill">${course.hours}h</span>
+                <span class="pill">${course.type || "Disciplina"}</span>
+              </div>
+              ${course.req.length ? `<div class="req">Pré: ${course.req.map(code => byCode[code]?.name ? `${code}` : code).join(", ")}${missing.length && !courseDone ? ` | faltam ${missing.join(", ")}` : ""}</div>` : ""}
+            </div>
+          `;
+          article.appendChild(row);
+        });
+
+        if (extraHours[period]) {
+          const extra = document.createElement("div");
+          extra.className = "course";
+          extra.innerHTML = `
+            <div></div>
+            <div>
+              <span class="code">Bloco</span>
+              <h3>${extraHours[period]}</h3>
+              <div class="meta"><span class="pill">carga adicional do período</span></div>
+            </div>
+          `;
+          article.appendChild(extra);
+        }
+
+        periods.appendChild(article);
+      }
+
+      document.querySelectorAll("input[type='checkbox'][data-code]").forEach(input => {
+        input.addEventListener("change", event => {
+          const code = event.target.dataset.code;
+          if (event.target.checked) done.add(code);
+          else done.delete(code);
+          save();
+          render();
+        });
+      });
+
+      renderStats();
+      renderSide();
+    }
+
+    function renderStats() {
+      const total = courses.length;
+      const doneCourses = courses.filter(course => done.has(course.code));
+      const pending = courses.filter(course => !done.has(course.code));
+      const open = pending.filter(isOpen);
+      const blocked = pending.filter(course => !isOpen(course));
+      const hours = doneCourses.reduce((sum, course) => sum + course.hours, 0);
+      const percent = Math.round((doneCourses.length / total) * 100);
+
+      document.getElementById("done-count").textContent = `${doneCourses.length}/${total}`;
+      document.getElementById("hours-count").textContent = `${hours}h`;
+      document.getElementById("open-count").textContent = open.length;
+      document.getElementById("blocked-count").textContent = blocked.length;
+      document.getElementById("done-bar").style.width = `${percent}%`;
+    }
+
+    function renderSide() {
+      const nextList = document.getElementById("next-list");
+      const chainList = document.getElementById("chain-list");
+      const next = courses
+        .filter(course => !done.has(course.code) && isOpen(course))
+        .sort((a, b) => a.period - b.period || a.code.localeCompare(b.code))
+        .slice(0, 8);
+
+      nextList.innerHTML = next.length
+        ? next.map(course => `<div class="small-card"><strong>${course.code} - ${course.name}</strong><span>${course.period}º período · ${course.hours}h</span></div>`).join("")
+        : `<div class="empty">Nenhuma disciplina pendente liberada com as marcações atuais.</div>`;
+
+      const unlockMap = courses.map(course => {
+        const unlocks = courses.filter(other => other.req.includes(course.code)).map(other => other.code);
+        return { ...course, unlocks };
+      }).filter(course => course.unlocks.length);
+
+      chainList.innerHTML = unlockMap
+        .sort((a, b) => b.unlocks.length - a.unlocks.length)
+        .slice(0, 9)
+        .map(course => `<div class="small-card"><strong>${course.code}</strong><span>destrava ${course.unlocks.join(", ")}</span></div>`)
+        .join("");
+    }
+
+    document.getElementById("filter").addEventListener("change", render);
+    document.getElementById("reset").addEventListener("click", () => {
+      done = new Set();
+      save();
+      render();
+    });
+    document.getElementById("mark-period").addEventListener("click", () => {
+      const period = Number(document.getElementById("period-select").value);
+      courses.filter(course => course.period === period).forEach(course => done.add(course.code));
+      save();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
