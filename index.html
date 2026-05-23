@@ -76,6 +76,32 @@
 
     button:hover { border-color: #a9a397; }
 
+    .file-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 6px;
+      min-height: 38px;
+      padding: 8px 12px;
+      font: inherit;
+      box-shadow: 0 1px 0 rgba(32, 33, 36, .04);
+      cursor: pointer;
+    }
+
+    .file-button:hover { border-color: #a9a397; }
+
+    .file-button input { display: none; }
+
+    .status-message {
+      color: var(--muted);
+      font-size: 13px;
+      min-height: 18px;
+      flex-basis: 100%;
+    }
+
     main {
       padding: 22px clamp(16px, 3vw, 36px) 44px;
       display: grid;
@@ -357,6 +383,7 @@
       .periods { grid-template-columns: 1fr; }
       .toolbar { align-items: stretch; }
       button,
+      .file-button,
       .select { width: 100%; }
     }
   </style>
@@ -386,7 +413,14 @@
         <option value="9">9º período</option>
         <option value="10">10º período</option>
       </select>
+      <button id="export-progress">Exportar progresso</button>
+      <label class="file-button">
+        Importar progresso
+        <input id="import-progress" type="file" accept="application/json,.json">
+      </label>
+      <button id="copy-link">Copiar link com progresso</button>
       <button id="reset">Limpar marcações</button>
+      <div class="status-message" id="status-message" aria-live="polite"></div>
     </div>
   </header>
 
@@ -502,9 +536,32 @@
     };
 
     const storeKey = "biomedicina-ufmg-n20262-done";
-    let done = new Set(JSON.parse(localStorage.getItem(storeKey) || "[]"));
+    const validCodes = new Set(courses.map(course => course.code));
+    let done = new Set(readInitialProgress());
 
     const byCode = Object.fromEntries(courses.map(course => [course.code, course]));
+
+    function normalizeCodes(codes) {
+      if (!Array.isArray(codes)) return [];
+      return [...new Set(codes.map(String).filter(code => validCodes.has(code)))];
+    }
+
+    function readInitialProgress() {
+      const params = new URLSearchParams(window.location.search);
+      const doneParam = params.get("done");
+      if (doneParam) {
+        const fromUrl = doneParam.split(",").map(code => code.trim().toUpperCase());
+        const normalized = normalizeCodes(fromUrl);
+        localStorage.setItem(storeKey, JSON.stringify(normalized));
+        return normalized;
+      }
+
+      try {
+        return normalizeCodes(JSON.parse(localStorage.getItem(storeKey) || "[]"));
+      } catch {
+        return [];
+      }
+    }
 
     function isOpen(course) {
       return course.req.every(code => done.has(code));
@@ -516,6 +573,32 @@
 
     function save() {
       localStorage.setItem(storeKey, JSON.stringify([...done]));
+    }
+
+    function setStatus(message) {
+      const status = document.getElementById("status-message");
+      status.textContent = message;
+      window.clearTimeout(setStatus.timer);
+      setStatus.timer = window.setTimeout(() => {
+        status.textContent = "";
+      }, 4200);
+    }
+
+    function currentProgressPayload() {
+      return {
+        course: "Biomedicina UFMG",
+        curriculum: "N-20262",
+        updatedAt: new Date().toISOString(),
+        done: [...done].sort()
+      };
+    }
+
+    function progressUrl() {
+      const url = new URL(window.location.href);
+      const codes = [...done].sort();
+      if (codes.length) url.searchParams.set("done", codes.join(","));
+      else url.searchParams.delete("done");
+      return url.toString();
     }
 
     function render() {
@@ -646,6 +729,48 @@
       courses.filter(course => course.period === period).forEach(course => done.add(course.code));
       save();
       render();
+    });
+    document.getElementById("export-progress").addEventListener("click", () => {
+      const payload = currentProgressPayload();
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "progresso-biomedicina-ufmg-n20262.json";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(link.href);
+      setStatus("Progresso exportado em JSON.");
+    });
+    document.getElementById("import-progress").addEventListener("change", event => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        try {
+          const payload = JSON.parse(reader.result);
+          const imported = normalizeCodes(payload.done);
+          done = new Set(imported);
+          save();
+          render();
+          setStatus(`${imported.length} disciplinas importadas.`);
+        } catch {
+          setStatus("Não consegui ler esse arquivo de progresso.");
+        } finally {
+          event.target.value = "";
+        }
+      });
+      reader.readAsText(file);
+    });
+    document.getElementById("copy-link").addEventListener("click", async () => {
+      const url = progressUrl();
+      try {
+        await navigator.clipboard.writeText(url);
+        setStatus("Link com progresso copiado.");
+      } catch {
+        window.prompt("Copie o link com progresso:", url);
+      }
     });
 
     render();
