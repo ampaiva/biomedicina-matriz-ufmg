@@ -365,12 +365,198 @@
       font-size: 18px;
     }
 
+    .simulator {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: clip;
+    }
+
+    .simulator-header {
+      padding: 14px 15px;
+      border-bottom: 1px solid var(--line);
+      background: #fdfbf7;
+    }
+
+    .simulator-header h2 {
+      margin: 0 0 5px;
+      font-size: 18px;
+    }
+
+    .simulator-body {
+      display: grid;
+      grid-template-columns: 380px minmax(0, 1fr);
+      gap: 16px;
+      padding: 15px;
+    }
+
+    .schedule-form {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .field input,
+    .field select {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      min-height: 38px;
+      padding: 8px 10px;
+      font: inherit;
+      background: #fff;
+      color: var(--ink);
+      width: 100%;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .offering-list {
+      display: grid;
+      gap: 8px;
+      max-height: 460px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .offering {
+      border: 1px solid #e5dfd5;
+      border-radius: 7px;
+      padding: 9px;
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: start;
+      background: #fffefa;
+      font-size: 13px;
+    }
+
+    .offering.conflict {
+      background: #fff8f2;
+      border-color: #e7b98e;
+    }
+
+    .offering strong,
+    .offering span {
+      display: block;
+    }
+
+    .offering span {
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .icon-button {
+      min-height: 30px;
+      padding: 4px 8px;
+    }
+
+    .schedule-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .schedule-summary div {
+      border: 1px solid #e5dfd5;
+      border-radius: 7px;
+      padding: 10px;
+      background: #fffefa;
+    }
+
+    .schedule-summary strong {
+      display: block;
+      font-size: 18px;
+    }
+
+    .timetable-wrap {
+      overflow: auto;
+      border: 1px solid #e5dfd5;
+      border-radius: 8px;
+      background: #fffefa;
+    }
+
+    .timetable {
+      min-width: 760px;
+      display: grid;
+      grid-template-columns: 64px repeat(6, minmax(105px, 1fr));
+      grid-template-rows: 34px repeat(34, 24px);
+      position: relative;
+    }
+
+    .time-head,
+    .day-head,
+    .time-cell,
+    .day-bg {
+      border-right: 1px solid #ece8df;
+      border-bottom: 1px solid #ece8df;
+    }
+
+    .time-head,
+    .day-head {
+      background: #f8f4ec;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .time-cell {
+      color: var(--muted);
+      font-size: 11px;
+      padding: 3px 5px;
+      background: #fffefa;
+    }
+
+    .day-bg {
+      background: #fffefa;
+    }
+
+    .slot-block {
+      margin: 2px;
+      border-radius: 6px;
+      border: 1px solid rgba(47, 111, 159, .35);
+      background: rgba(47, 111, 159, .14);
+      color: #173f60;
+      padding: 5px 6px;
+      font-size: 12px;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .slot-block.conflict {
+      border-color: rgba(185, 74, 72, .55);
+      background: rgba(185, 74, 72, .14);
+      color: #7c2928;
+    }
+
     @media (max-width: 1500px) {
       .periods { grid-template-columns: repeat(4, minmax(220px, 1fr)); }
     }
 
     @media (max-width: 1180px) {
       .layout { grid-template-columns: 1fr; }
+      .simulator-body { grid-template-columns: 1fr; }
       .side-panel { position: static; }
       .side-content { max-height: none; }
       .periods { grid-template-columns: repeat(3, minmax(220px, 1fr)); }
@@ -379,6 +565,7 @@
     @media (max-width: 820px) {
       header { position: static; }
       .stats,
+      .schedule-summary,
       .summary-grid,
       .periods { grid-template-columns: 1fr; }
       .toolbar { align-items: stretch; }
@@ -442,6 +629,46 @@
       <div class="stat">
         <strong id="blocked-count">0</strong>
         <span>pendentes com pré-requisito faltando</span>
+      </div>
+    </section>
+
+    <section class="simulator" aria-label="Simulador de horário">
+      <div class="simulator-header">
+        <h2>Simulador de horário</h2>
+        <p class="subtitle">Cadastre opções de turma e selecione as combinações para ver conflitos. Use formatos como <strong>seg 19:00-20:40, qua 20:50-22:30</strong>.</p>
+      </div>
+      <div class="simulator-body">
+        <div class="schedule-form">
+          <div class="field">
+            <label for="schedule-course">Matéria</label>
+            <select id="schedule-course"></select>
+          </div>
+          <div class="field">
+            <label for="schedule-label">Turma ou observação</label>
+            <input id="schedule-label" type="text" placeholder="Turma A, prática, optativa...">
+          </div>
+          <div class="field">
+            <label for="schedule-times">Dias e horários</label>
+            <input id="schedule-times" type="text" placeholder="seg 19:00-20:40, qua 20:50-22:30">
+            <div class="hint">Dias aceitos: seg, ter, qua, qui, sex, sab. O simulador salva no navegador e no JSON exportado.</div>
+          </div>
+          <button id="add-offering">Adicionar opção</button>
+          <button id="clear-schedule">Limpar simulador</button>
+          <div>
+            <h3 style="margin:6px 0 8px;font-size:14px">Opções cadastradas</h3>
+            <div class="offering-list" id="offering-list"></div>
+          </div>
+        </div>
+        <div>
+          <div class="schedule-summary">
+            <div><strong id="selected-count">0</strong><span>opções selecionadas</span></div>
+            <div><strong id="selected-hours">0h</strong><span>carga das matérias</span></div>
+            <div><strong id="conflict-count">0</strong><span>conflitos no horário</span></div>
+          </div>
+          <div class="timetable-wrap">
+            <div class="timetable" id="timetable"></div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -536,14 +763,40 @@
     };
 
     const storeKey = "biomedicina-ufmg-n20262-done";
+    const scheduleStoreKey = "biomedicina-ufmg-n20262-schedule";
     const validCodes = new Set(courses.map(course => course.code));
+    const days = [
+      { key: "seg", label: "Seg" },
+      { key: "ter", label: "Ter" },
+      { key: "qua", label: "Qua" },
+      { key: "qui", label: "Qui" },
+      { key: "sex", label: "Sex" },
+      { key: "sab", label: "Sáb" }
+    ];
+    const dayAliases = {
+      segunda: "seg",
+      seg: "seg",
+      terca: "ter",
+      terça: "ter",
+      ter: "ter",
+      quarta: "qua",
+      qua: "qua",
+      quinta: "qui",
+      qui: "qui",
+      sexta: "sex",
+      sex: "sex",
+      sabado: "sab",
+      sábado: "sab",
+      sab: "sab"
+    };
     let done = new Set(readInitialProgress());
+    let schedule = readSchedule();
 
     const byCode = Object.fromEntries(courses.map(course => [course.code, course]));
 
     function normalizeCodes(codes) {
       if (!Array.isArray(codes)) return [];
-      return [...new Set(codes.map(String).filter(code => validCodes.has(code)))];
+      return [...new Set(codes.map(code => String(code).toUpperCase()).filter(code => validCodes.has(code)))];
     }
 
     function readInitialProgress() {
@@ -575,6 +828,37 @@
       localStorage.setItem(storeKey, JSON.stringify([...done]));
     }
 
+    function readSchedule() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(scheduleStoreKey) || "{}");
+        return {
+          offerings: Array.isArray(parsed.offerings) ? parsed.offerings.filter(isValidOffering) : [],
+          selected: Array.isArray(parsed.selected) ? parsed.selected.map(String) : []
+        };
+      } catch {
+        return { offerings: [], selected: [] };
+      }
+    }
+
+    function isValidOffering(offering) {
+      return offering &&
+        typeof offering.id === "string" &&
+        validCodes.has(offering.code) &&
+        Array.isArray(offering.meetings) &&
+        offering.meetings.every(meeting =>
+          days.some(day => day.key === meeting.day) &&
+          Number.isInteger(meeting.start) &&
+          Number.isInteger(meeting.end) &&
+          meeting.end > meeting.start
+        );
+    }
+
+    function saveSchedule() {
+      const selectedIds = new Set(schedule.offerings.map(offering => offering.id));
+      schedule.selected = schedule.selected.filter(id => selectedIds.has(id));
+      localStorage.setItem(scheduleStoreKey, JSON.stringify(schedule));
+    }
+
     function setStatus(message) {
       const status = document.getElementById("status-message");
       status.textContent = message;
@@ -589,7 +873,8 @@
         course: "Biomedicina UFMG",
         curriculum: "N-20262",
         updatedAt: new Date().toISOString(),
-        done: [...done].sort()
+        done: [...done].sort(),
+        schedule
       };
     }
 
@@ -599,6 +884,52 @@
       if (codes.length) url.searchParams.set("done", codes.join(","));
       else url.searchParams.delete("done");
       return url.toString();
+    }
+
+    function timeToMinutes(value) {
+      const match = String(value).trim().match(/^(\d{1,2}):?(\d{2})$/);
+      if (!match) return null;
+      const hours = Number(match[1]);
+      const minutes = Number(match[2]);
+      if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
+      return hours * 60 + minutes;
+    }
+
+    function formatTime(minutes) {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+    }
+
+    function parseMeetings(text) {
+      return String(text).split(",").map(part => {
+        const match = part.trim().toLowerCase().match(/^([a-záç]+)\s+(\d{1,2}:?\d{2})\s*-\s*(\d{1,2}:?\d{2})$/i);
+        if (!match) return null;
+        const day = dayAliases[match[1]];
+        const start = timeToMinutes(match[2]);
+        const end = timeToMinutes(match[3]);
+        if (!day || start === null || end === null || end <= start) return null;
+        return { day, start, end };
+      }).filter(Boolean);
+    }
+
+    function meetingText(meetings) {
+      return meetings
+        .map(meeting => `${meeting.day} ${formatTime(meeting.start)}-${formatTime(meeting.end)}`)
+        .join(", ");
+    }
+
+    function overlaps(a, b) {
+      return a.day === b.day && a.start < b.end && b.start < a.end;
+    }
+
+    function conflictsFor(offering, selectedOfferings) {
+      return selectedOfferings.filter(selected =>
+        selected.id !== offering.id &&
+        selected.meetings.some(selectedMeeting =>
+          offering.meetings.some(meeting => overlaps(meeting, selectedMeeting))
+        )
+      );
     }
 
     function render() {
@@ -676,6 +1007,8 @@
 
       renderStats();
       renderSide();
+      renderScheduleCourseOptions();
+      renderSchedule();
     }
 
     function renderStats() {
@@ -718,6 +1051,113 @@
         .join("");
     }
 
+    function renderScheduleCourseOptions() {
+      const select = document.getElementById("schedule-course");
+      const current = select.value;
+      const pendingOpen = courses
+        .filter(course => !done.has(course.code) && isOpen(course))
+        .sort((a, b) => a.period - b.period || a.code.localeCompare(b.code));
+      const rest = courses
+        .filter(course => !pendingOpen.includes(course))
+        .sort((a, b) => a.period - b.period || a.code.localeCompare(b.code));
+
+      select.innerHTML = [
+        ...pendingOpen.map(course => `<option value="${course.code}">${course.code} - ${course.name}</option>`),
+        `<option disabled>──────────</option>`,
+        ...rest.map(course => `<option value="${course.code}">${course.code} - ${course.name}</option>`)
+      ].join("");
+
+      if (current && validCodes.has(current)) select.value = current;
+    }
+
+    function renderSchedule() {
+      const selectedSet = new Set(schedule.selected);
+      const selectedOfferings = schedule.offerings.filter(offering => selectedSet.has(offering.id));
+      const allConflicts = selectedOfferings.flatMap(offering => conflictsFor(offering, selectedOfferings));
+      const conflictIds = new Set(allConflicts.map(offering => offering.id));
+      const offeringList = document.getElementById("offering-list");
+      const selectedHours = selectedOfferings.reduce((sum, offering) => sum + (byCode[offering.code]?.hours || 0), 0);
+
+      document.getElementById("selected-count").textContent = selectedOfferings.length;
+      document.getElementById("selected-hours").textContent = `${selectedHours}h`;
+      document.getElementById("conflict-count").textContent = conflictIds.size;
+
+      offeringList.innerHTML = schedule.offerings.length
+        ? schedule.offerings.map(offering => {
+          const selected = selectedSet.has(offering.id);
+          const conflicts = conflictsFor(offering, selectedOfferings);
+          const disabled = conflicts.length && !selected;
+          const course = byCode[offering.code];
+          return `
+            <div class="offering ${conflicts.length ? "conflict" : ""}">
+              <input type="checkbox" data-offering="${offering.id}" ${selected ? "checked" : ""} ${disabled ? "disabled" : ""}>
+              <div>
+                <strong>${offering.code} - ${offering.label || course.name}</strong>
+                <span>${course.name}</span>
+                <span>${meetingText(offering.meetings)}</span>
+                ${conflicts.length ? `<span>Conflito com ${conflicts.map(item => item.code).join(", ")}</span>` : ""}
+              </div>
+              <button class="icon-button" data-remove-offering="${offering.id}" title="Remover opção">×</button>
+            </div>
+          `;
+        }).join("")
+        : `<div class="empty">Nenhuma opção cadastrada ainda.</div>`;
+
+      document.querySelectorAll("[data-offering]").forEach(input => {
+        input.addEventListener("change", event => {
+          const id = event.target.dataset.offering;
+          if (event.target.checked) schedule.selected.push(id);
+          else schedule.selected = schedule.selected.filter(selectedId => selectedId !== id);
+          saveSchedule();
+          renderSchedule();
+        });
+      });
+
+      document.querySelectorAll("[data-remove-offering]").forEach(button => {
+        button.addEventListener("click", event => {
+          const id = event.target.dataset.removeOffering;
+          schedule.offerings = schedule.offerings.filter(offering => offering.id !== id);
+          schedule.selected = schedule.selected.filter(selectedId => selectedId !== id);
+          saveSchedule();
+          renderSchedule();
+        });
+      });
+
+      renderTimetable(selectedOfferings, conflictIds);
+    }
+
+    function renderTimetable(selectedOfferings, conflictIds) {
+      const timetable = document.getElementById("timetable");
+      const startDay = 7 * 60;
+      const step = 30;
+      const rows = 34;
+      timetable.innerHTML = `<div class="time-head" style="grid-column:1;grid-row:1">Hora</div>` +
+        days.map((day, index) => `<div class="day-head" style="grid-column:${index + 2};grid-row:1">${day.label}</div>`).join("");
+
+      for (let row = 0; row < rows; row += 1) {
+        const minutes = startDay + row * step;
+        timetable.insertAdjacentHTML("beforeend", `<div class="time-cell" style="grid-column:1;grid-row:${row + 2}">${minutes % 60 === 0 ? formatTime(minutes) : ""}</div>`);
+        days.forEach((day, index) => {
+          timetable.insertAdjacentHTML("beforeend", `<div class="day-bg" style="grid-column:${index + 2};grid-row:${row + 2}"></div>`);
+        });
+      }
+
+      selectedOfferings.forEach(offering => {
+        offering.meetings.forEach(meeting => {
+          const dayIndex = days.findIndex(day => day.key === meeting.day);
+          const rowStart = Math.max(0, Math.floor((meeting.start - startDay) / step)) + 2;
+          const rowEnd = Math.min(rows, Math.ceil((meeting.end - startDay) / step)) + 2;
+          if (dayIndex < 0 || rowEnd <= 2 || rowStart >= rows + 2) return;
+          const block = document.createElement("div");
+          block.className = `slot-block ${conflictIds.has(offering.id) ? "conflict" : ""}`;
+          block.style.gridColumn = String(dayIndex + 2);
+          block.style.gridRow = `${rowStart} / ${rowEnd}`;
+          block.innerHTML = `<strong>${offering.code}</strong><br>${offering.label || byCode[offering.code].name}<br>${formatTime(meeting.start)}-${formatTime(meeting.end)}`;
+          timetable.appendChild(block);
+        });
+      });
+    }
+
     document.getElementById("filter").addEventListener("change", render);
     document.getElementById("reset").addEventListener("click", () => {
       done = new Set();
@@ -752,6 +1192,13 @@
           const payload = JSON.parse(reader.result);
           const imported = normalizeCodes(payload.done);
           done = new Set(imported);
+          if (payload.schedule && Array.isArray(payload.schedule.offerings)) {
+            schedule = {
+              offerings: payload.schedule.offerings.filter(isValidOffering),
+              selected: Array.isArray(payload.schedule.selected) ? payload.schedule.selected.map(String) : []
+            };
+            saveSchedule();
+          }
           save();
           render();
           setStatus(`${imported.length} disciplinas importadas.`);
@@ -771,6 +1218,34 @@
       } catch {
         window.prompt("Copie o link com progresso:", url);
       }
+    });
+    document.getElementById("add-offering").addEventListener("click", () => {
+      const code = document.getElementById("schedule-course").value;
+      const label = document.getElementById("schedule-label").value.trim();
+      const meetings = parseMeetings(document.getElementById("schedule-times").value);
+
+      if (!validCodes.has(code) || !meetings.length) {
+        setStatus("Informe uma matéria e pelo menos um horário válido.");
+        return;
+      }
+
+      schedule.offerings.push({
+        id: `${code}-${Date.now()}`,
+        code,
+        label,
+        meetings
+      });
+      saveSchedule();
+      document.getElementById("schedule-label").value = "";
+      document.getElementById("schedule-times").value = "";
+      setStatus("Opção de horário adicionada.");
+      renderSchedule();
+    });
+    document.getElementById("clear-schedule").addEventListener("click", () => {
+      schedule = { offerings: [], selected: [] };
+      saveSchedule();
+      renderSchedule();
+      setStatus("Simulador limpo.");
     });
 
     render();
