@@ -7,16 +7,19 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f6f4ef;
+      --bg: #fff1f6;
       --panel: #ffffff;
-      --ink: #202124;
-      --muted: #666b73;
-      --line: #d7d2c7;
-      --blue: #2f6f9f;
-      --green: #3f7d58;
-      --orange: #b9652b;
-      --red: #b94a48;
-      --shadow: 0 10px 25px rgba(32, 33, 36, .08);
+      --ink: #331824;
+      --muted: #806170;
+      --line: #ecc7d6;
+      --blue: #9d3b78;
+      --green: #c43f7f;
+      --done-green: #3f7d58;
+      --done-bg: #f3faf5;
+      --done-ink: #405246;
+      --orange: #d05d72;
+      --red: #b93152;
+      --shadow: 0 10px 25px rgba(104, 30, 65, .10);
     }
 
     * { box-sizing: border-box; }
@@ -32,7 +35,7 @@
     header {
       padding: 28px clamp(16px, 3vw, 36px) 18px;
       border-bottom: 1px solid var(--line);
-      background: #fbfaf7;
+      background: #fff7fa;
       position: sticky;
       top: 0;
       z-index: 10;
@@ -67,14 +70,14 @@
       min-height: 38px;
       padding: 8px 12px;
       font: inherit;
-      box-shadow: 0 1px 0 rgba(32, 33, 36, .04);
+      box-shadow: 0 1px 0 rgba(104, 30, 65, .05);
     }
 
     button {
       cursor: pointer;
     }
 
-    button:hover { border-color: #a9a397; }
+    button:hover { border-color: #d89ab6; }
 
     .file-button {
       display: inline-flex;
@@ -87,11 +90,11 @@
       min-height: 38px;
       padding: 8px 12px;
       font: inherit;
-      box-shadow: 0 1px 0 rgba(32, 33, 36, .04);
+      box-shadow: 0 1px 0 rgba(104, 30, 65, .05);
       cursor: pointer;
     }
 
-    .file-button:hover { border-color: #a9a397; }
+    .file-button:hover { border-color: #d89ab6; }
 
     .file-button input { display: none; }
 
@@ -135,7 +138,7 @@
 
     .progress {
       height: 9px;
-      background: #e7e1d6;
+      background: #f5dbe6;
       border-radius: 999px;
       overflow: hidden;
       margin-top: 10px;
@@ -144,7 +147,7 @@
     .progress > div {
       height: 100%;
       width: 0;
-      background: linear-gradient(90deg, var(--green), var(--blue));
+      background: linear-gradient(90deg, var(--done-green), var(--blue));
       transition: width .2s ease;
     }
 
@@ -182,7 +185,7 @@
       justify-content: space-between;
       gap: 8px;
       align-items: baseline;
-      background: #fdfbf7;
+      background: #fff7fa;
     }
 
     .period-header h2 {
@@ -201,28 +204,28 @@
       grid-template-columns: 26px minmax(0, 1fr);
       gap: 8px;
       padding: 11px 12px;
-      border-bottom: 1px solid #ece8df;
+      border-bottom: 1px solid #f2d9e3;
       min-height: 86px;
     }
 
     .course:last-child { border-bottom: 0; }
 
     .course.blocked {
-      background: #fff8f2;
+      background: #fff2f4;
       border-left: 3px solid var(--orange);
       padding-left: 9px;
     }
 
     .course.done {
-      background: #f3faf5;
-      color: #405246;
+      background: var(--done-bg);
+      color: var(--done-ink);
     }
 
     .course input {
       inline-size: 18px;
       block-size: 18px;
       margin-top: 2px;
-      accent-color: var(--green);
+      accent-color: var(--done-green);
     }
 
     .code {
@@ -231,8 +234,8 @@
       min-height: 22px;
       padding: 2px 6px;
       border-radius: 4px;
-      background: #eef3f7;
-      color: #204e73;
+      background: #fbe3ee;
+      color: #8a2f66;
       font-size: 12px;
       font-weight: 700;
       margin-bottom: 5px;
@@ -254,7 +257,7 @@
     }
 
     .pill {
-      border: 1px solid #ded8cc;
+      border: 1px solid #efd1dd;
       border-radius: 999px;
       padding: 2px 7px;
       background: #fff;
@@ -262,7 +265,7 @@
 
     .req {
       margin-top: 7px;
-      color: #7a4b20;
+      color: #994251;
       font-size: 12px;
     }
 
@@ -281,7 +284,7 @@
       padding: 13px 14px;
       font-size: 16px;
       border-bottom: 1px solid var(--line);
-      background: #fdfbf7;
+      background: #fff7fa;
     }
 
     .side-content {
@@ -299,10 +302,10 @@
     }
 
     .small-card {
-      border: 1px solid #e5dfd5;
+      border: 1px solid #f1d6e1;
       border-radius: 7px;
       padding: 9px;
-      background: #fffefa;
+      background: #fff8fb;
       font-size: 13px;
     }
 
@@ -354,10 +357,10 @@
     }
 
     .summary-grid div {
-      border: 1px solid #e5dfd5;
+      border: 1px solid #f1d6e1;
       border-radius: 7px;
       padding: 10px;
-      background: #fffefa;
+      background: #fff8fb;
     }
 
     .summary-grid strong {
@@ -376,12 +379,21 @@
     .simulator-header {
       padding: 14px 15px;
       border-bottom: 1px solid var(--line);
-      background: #fdfbf7;
+      background: #fff7fa;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      gap: 12px;
+      align-items: end;
     }
 
     .simulator-header h2 {
       margin: 0 0 5px;
       font-size: 18px;
+    }
+
+    .simulator-header h2,
+    .simulator-header p {
+      grid-column: 1;
     }
 
     .simulator-body {
@@ -395,6 +407,15 @@
       display: grid;
       gap: 10px;
       align-content: start;
+    }
+
+    .semester-controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: end;
+      grid-column: 2;
+      grid-row: 1 / span 2;
     }
 
     .field {
@@ -426,6 +447,53 @@
       font-size: 12px;
     }
 
+    .manual-offering {
+      border: 1px solid #f1d6e1;
+      border-radius: 7px;
+      background: #fff8fb;
+      padding: 0;
+    }
+
+    .manual-offering summary {
+      min-height: 38px;
+      padding: 9px 11px;
+      cursor: pointer;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      list-style-position: inside;
+    }
+
+    .manual-offering[open] summary {
+      border-bottom: 1px solid #f1d6e1;
+    }
+
+    .manual-offering-body {
+      display: grid;
+      gap: 10px;
+      padding: 11px;
+    }
+
+    .day-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .day-filter button {
+      min-height: 30px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .day-filter button.active {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+
     .offering-list {
       display: grid;
       gap: 8px;
@@ -435,20 +503,20 @@
     }
 
     .offering {
-      border: 1px solid #e5dfd5;
+      border: 1px solid #f1d6e1;
       border-radius: 7px;
       padding: 9px;
       display: grid;
       grid-template-columns: 24px minmax(0, 1fr) auto;
       gap: 8px;
       align-items: start;
-      background: #fffefa;
+      background: #fff8fb;
       font-size: 13px;
     }
 
     .offering.conflict {
-      background: #fff8f2;
-      border-color: #e7b98e;
+      background: #fff2f4;
+      border-color: #e9a3b0;
     }
 
     .offering strong,
@@ -474,10 +542,10 @@
     }
 
     .schedule-summary div {
-      border: 1px solid #e5dfd5;
+      border: 1px solid #f1d6e1;
       border-radius: 7px;
       padding: 10px;
-      background: #fffefa;
+      background: #fff8fb;
     }
 
     .schedule-summary strong {
@@ -487,9 +555,9 @@
 
     .timetable-wrap {
       overflow: auto;
-      border: 1px solid #e5dfd5;
+      border: 1px solid #f1d6e1;
       border-radius: 8px;
-      background: #fffefa;
+      background: #fff8fb;
     }
 
     .timetable {
@@ -504,13 +572,13 @@
     .day-head,
     .time-cell,
     .day-bg {
-      border-right: 1px solid #ece8df;
-      border-bottom: 1px solid #ece8df;
+      border-right: 1px solid #f2d9e3;
+      border-bottom: 1px solid #f2d9e3;
     }
 
     .time-head,
     .day-head {
-      background: #f8f4ec;
+      background: #fff0f6;
       font-size: 12px;
       font-weight: 700;
       color: var(--muted);
@@ -525,19 +593,19 @@
       color: var(--muted);
       font-size: 11px;
       padding: 3px 5px;
-      background: #fffefa;
+      background: #fff8fb;
     }
 
     .day-bg {
-      background: #fffefa;
+      background: #fff8fb;
     }
 
     .slot-block {
       margin: 2px;
       border-radius: 6px;
-      border: 1px solid rgba(47, 111, 159, .35);
-      background: rgba(47, 111, 159, .14);
-      color: #173f60;
+      border: 1px solid rgba(157, 59, 120, .35);
+      background: rgba(196, 63, 127, .14);
+      color: #64254f;
       padding: 5px 6px;
       font-size: 12px;
       overflow: hidden;
@@ -545,9 +613,9 @@
     }
 
     .slot-block.conflict {
-      border-color: rgba(185, 74, 72, .55);
-      background: rgba(185, 74, 72, .14);
-      color: #7c2928;
+      border-color: rgba(185, 49, 82, .55);
+      background: rgba(185, 49, 82, .14);
+      color: #84213a;
     }
 
     @media (max-width: 1500px) {
@@ -557,6 +625,11 @@
     @media (max-width: 1180px) {
       .layout { grid-template-columns: 1fr; }
       .simulator-body { grid-template-columns: 1fr; }
+      .simulator-header { grid-template-columns: 1fr; }
+      .semester-controls {
+        grid-column: 1;
+        grid-row: auto;
+      }
       .side-panel { position: static; }
       .side-content { max-height: none; }
       .periods { grid-template-columns: repeat(3, minmax(220px, 1fr)); }
@@ -568,6 +641,7 @@
       .schedule-summary,
       .summary-grid,
       .periods { grid-template-columns: 1fr; }
+      .semester-controls { grid-template-columns: 1fr; }
       .toolbar { align-items: stretch; }
       button,
       .file-button,
@@ -584,7 +658,7 @@
         <option value="all">Mostrar todas</option>
         <option value="open">Só liberadas</option>
         <option value="blocked">Só bloqueadas</option>
-        <option value="pending">Só pendentes</option>
+        <option value="pending" selected>Só pendentes</option>
         <option value="done">Só concluídas</option>
       </select>
       <button id="mark-period">Marcar período selecionado</button>
@@ -636,28 +710,41 @@
       <div class="simulator-header">
         <h2>Simulador de horário</h2>
         <p class="subtitle">Cadastre opções de turma e selecione as combinações para ver conflitos. Use formatos como <strong>seg 19:00-20:40, qua 20:50-22:30</strong>.</p>
+        <div class="semester-controls">
+          <div class="field">
+            <label for="semester-select">Semestre da previsão</label>
+            <select id="semester-select"></select>
+          </div>
+          <button id="add-semester" type="button">Adicionar próximo</button>
+        </div>
       </div>
       <div class="simulator-body">
         <div class="schedule-form">
-          <div class="field">
-            <label for="schedule-course">Matéria</label>
-            <select id="schedule-course"></select>
-          </div>
-          <div class="field">
-            <label for="schedule-label">Turma ou observação</label>
-            <input id="schedule-label" type="text" placeholder="Turma A, prática, optativa...">
-          </div>
-          <div class="field">
-            <label for="schedule-times">Dias e horários</label>
-            <input id="schedule-times" type="text" placeholder="seg 19:00-20:40, qua 20:50-22:30">
-            <div class="hint">Dias aceitos: seg, ter, qua, qui, sex, sab. O simulador salva no navegador e no JSON exportado.</div>
-          </div>
-          <button id="add-offering">Adicionar opção</button>
-          <button id="clear-schedule">Limpar simulador</button>
           <div>
-            <h3 style="margin:6px 0 8px;font-size:14px">Opções cadastradas</h3>
+            <h3 style="margin:0 0 8px;font-size:14px">Opções cadastradas</h3>
+            <div class="day-filter" id="day-filter" aria-label="Filtrar opções por dia"></div>
             <div class="offering-list" id="offering-list"></div>
           </div>
+          <details class="manual-offering">
+            <summary>Adicionar opção manual</summary>
+            <div class="manual-offering-body">
+              <div class="field">
+                <label for="schedule-course">Matéria</label>
+                <select id="schedule-course"></select>
+              </div>
+              <div class="field">
+                <label for="schedule-label">Turma ou observação</label>
+                <input id="schedule-label" type="text" placeholder="Turma A, prática, optativa...">
+              </div>
+              <div class="field">
+                <label for="schedule-times">Dias e horários</label>
+                <input id="schedule-times" type="text" placeholder="seg 19:00-20:40, qua 20:50-22:30">
+                <div class="hint">Dias aceitos: seg, ter, qua, qui, sex, sab. O simulador salva no navegador e no JSON exportado.</div>
+              </div>
+              <button id="add-offering">Adicionar opção</button>
+            </div>
+          </details>
+          <button id="clear-schedule">Limpar simulador</button>
         </div>
         <div>
           <div class="schedule-summary">
@@ -678,7 +765,7 @@
         <h2>Próximas e dependências</h2>
         <div class="side-content">
           <div class="legend">
-            <span><i class="dot" style="background: var(--green)"></i>Concluída</span>
+            <span><i class="dot" style="background: var(--done-green)"></i>Concluída</span>
             <span><i class="dot" style="background: var(--blue)"></i>Liberada</span>
             <span><i class="dot" style="background: var(--orange)"></i>Bloqueada</span>
           </div>
@@ -766,6 +853,7 @@
     const scheduleStoreKey = "biomedicina-ufmg-n20262-schedule";
     const scheduleSeedKey = "biomedicina-ufmg-n20262-schedule-seed-version";
     const scheduleSeedVersion = "pdf-pages-11-12-v2";
+    const defaultSemesterId = "2026-02";
     const validCodes = new Set(courses.map(course => course.code));
     const days = [
       { key: "seg", label: "Seg" },
@@ -862,6 +950,36 @@
       return [...new Set(codes.map(code => String(code).toUpperCase()).filter(code => validCodes.has(code)))];
     }
 
+    function semesterLabel(id) {
+      const [year, term] = String(id).split("-");
+      return `${term}/${year}`;
+    }
+
+    function nextSemesterId(id) {
+      const [yearText, termText] = String(id).split("-");
+      const year = Number(yearText);
+      const term = Number(termText);
+      return term === 1 ? `${year}-02` : `${year + 1}-01`;
+    }
+
+    function normalizeSemesterIds(ids) {
+      const normalized = Array.isArray(ids)
+        ? ids.filter(id => /^\d{4}-(01|02)$/.test(String(id))).map(String)
+        : [];
+      return [...new Set([defaultSemesterId, ...normalized])].sort();
+    }
+
+    function normalizeSemesterSelections(value) {
+      const selections = {};
+      if (!value || typeof value !== "object" || Array.isArray(value)) return selections;
+      Object.entries(value).forEach(([semesterId, ids]) => {
+        if (/^\d{4}-(01|02)$/.test(semesterId)) {
+          selections[semesterId] = Array.isArray(ids) ? ids.map(String) : [];
+        }
+      });
+      return selections;
+    }
+
     function readInitialProgress() {
       const params = new URLSearchParams(window.location.search);
       const doneParam = params.get("done");
@@ -879,12 +997,26 @@
       }
     }
 
-    function isOpen(course) {
-      return course.req.every(code => done.has(code));
+    function activeCompletedSet() {
+      const completed = new Set(done);
+      const activeSemester = schedule?.activeSemester || defaultSemesterId;
+      schedule?.semesterIds
+        ?.filter(semesterId => semesterId < activeSemester)
+        .forEach(semesterId => {
+          (schedule.semesterSelections[semesterId] || []).forEach(offeringId => {
+            const offering = schedule.offerings.find(item => item.id === offeringId);
+            if (offering) completed.add(offering.code);
+          });
+        });
+      return completed;
     }
 
-    function blockers(course) {
-      return course.req.filter(code => !done.has(code));
+    function isOpen(course, completed = activeCompletedSet()) {
+      return course.req.every(code => completed.has(code));
+    }
+
+    function blockers(course, completed = activeCompletedSet()) {
+      return course.req.filter(code => !completed.has(code));
     }
 
     function save() {
@@ -894,12 +1026,27 @@
     function readSchedule() {
       try {
         const parsed = JSON.parse(localStorage.getItem(scheduleStoreKey) || "{}");
+        const semesterSelections = normalizeSemesterSelections(parsed.semesterSelections);
+        const semesterIds = normalizeSemesterIds(parsed.semesterIds || Object.keys(semesterSelections));
+        const activeSemester = semesterIds.includes(parsed.activeSemester) ? parsed.activeSemester : defaultSemesterId;
+        if (!semesterSelections[defaultSemesterId]) {
+          semesterSelections[defaultSemesterId] = Array.isArray(parsed.selected) ? parsed.selected.map(String) : [];
+        }
         return {
           offerings: Array.isArray(parsed.offerings) ? parsed.offerings.filter(isValidOffering) : [],
-          selected: Array.isArray(parsed.selected) ? parsed.selected.map(String) : []
+          selected: semesterSelections[activeSemester] || [],
+          semesterIds,
+          activeSemester,
+          semesterSelections
         };
       } catch {
-        return { offerings: [], selected: [] };
+        return {
+          offerings: [],
+          selected: [],
+          semesterIds: [defaultSemesterId],
+          activeSemester: defaultSemesterId,
+          semesterSelections: { [defaultSemesterId]: [] }
+        };
       }
     }
 
@@ -918,7 +1065,13 @@
 
     function saveSchedule() {
       const selectedIds = new Set(schedule.offerings.map(offering => offering.id));
-      schedule.selected = schedule.selected.filter(id => selectedIds.has(id));
+      schedule.semesterIds = normalizeSemesterIds(schedule.semesterIds);
+      if (!schedule.semesterIds.includes(schedule.activeSemester)) schedule.activeSemester = schedule.semesterIds[0];
+      schedule.semesterSelections = normalizeSemesterSelections(schedule.semesterSelections);
+      schedule.semesterIds.forEach(semesterId => {
+        schedule.semesterSelections[semesterId] = (schedule.semesterSelections[semesterId] || []).filter(id => selectedIds.has(id));
+      });
+      schedule.selected = schedule.semesterSelections[schedule.activeSemester] || [];
       localStorage.setItem(scheduleStoreKey, JSON.stringify(schedule));
     }
 
@@ -930,7 +1083,10 @@
       const additions = photoOfferings.filter(offering => !existingIds.has(offering.id));
       const seeded = {
         offerings: [...preservedOfferings, ...additions],
-        selected: currentSchedule.selected.filter(id => !id.startsWith("foto-"))
+        selected: currentSchedule.selected.filter(id => !id.startsWith("foto-")),
+        semesterIds: currentSchedule.semesterIds,
+        activeSemester: currentSchedule.activeSemester,
+        semesterSelections: currentSchedule.semesterSelections
       };
       localStorage.setItem(scheduleSeedKey, scheduleSeedVersion);
       localStorage.setItem(scheduleStoreKey, JSON.stringify(seeded));
@@ -946,13 +1102,32 @@
       }, 4200);
     }
 
+    function currentSchedulePayload() {
+      saveSchedule();
+      const validOfferingIds = new Set(schedule.offerings.map(offering => offering.id));
+      const semesterIds = normalizeSemesterIds(schedule.semesterIds);
+      const semesterSelections = {};
+      semesterIds.forEach(semesterId => {
+        semesterSelections[semesterId] = (schedule.semesterSelections[semesterId] || [])
+          .filter(id => validOfferingIds.has(id));
+      });
+
+      return {
+        offerings: schedule.offerings,
+        selected: semesterSelections[schedule.activeSemester] || [],
+        semesterIds,
+        activeSemester: semesterIds.includes(schedule.activeSemester) ? schedule.activeSemester : defaultSemesterId,
+        semesterSelections
+      };
+    }
+
     function currentProgressPayload() {
       return {
         course: "Biomedicina UFMG",
         curriculum: "N-20262",
         updatedAt: new Date().toISOString(),
         done: [...done].sort(),
-        schedule
+        schedule: currentSchedulePayload()
       };
     }
 
@@ -1010,8 +1185,20 @@
       );
     }
 
+    function matchesFilter(course, filter, completed = activeCompletedSet()) {
+      const courseDone = completed.has(course.code);
+      const courseOpen = isOpen(course, completed);
+      return !(
+        (filter === "open" && (courseDone || !courseOpen)) ||
+        (filter === "blocked" && (courseDone || courseOpen)) ||
+        (filter === "pending" && courseDone) ||
+        (filter === "done" && !courseDone)
+      );
+    }
+
     function render() {
       const filter = document.getElementById("filter").value;
+      const completed = activeCompletedSet();
       const periods = document.getElementById("periods");
       periods.innerHTML = "";
 
@@ -1027,21 +1214,16 @@
         `;
 
         periodCourses.forEach(course => {
-          const courseDone = done.has(course.code);
-          const courseOpen = isOpen(course);
-          const hidden =
-            (filter === "open" && (courseDone || !courseOpen)) ||
-            (filter === "blocked" && (courseDone || courseOpen)) ||
-            (filter === "pending" && courseDone) ||
-            (filter === "done" && !courseDone);
+          const courseDone = completed.has(course.code);
+          const courseOpen = isOpen(course, completed);
 
-          if (hidden) return;
+          if (!matchesFilter(course, filter, completed)) return;
 
-          const missing = blockers(course);
+          const missing = blockers(course, completed);
           const row = document.createElement("label");
           row.className = `course ${courseDone ? "done" : ""} ${!courseDone && !courseOpen ? "blocked" : ""}`;
           row.innerHTML = `
-            <input type="checkbox" ${courseDone ? "checked" : ""} data-code="${course.code}">
+            <input type="checkbox" ${done.has(course.code) ? "checked" : ""} data-code="${course.code}">
             <div>
               <span class="code">${course.code}</span>
               <h3>${course.name}</h3>
@@ -1085,16 +1267,18 @@
 
       renderStats();
       renderSide();
+      renderSemesterOptions();
       renderScheduleCourseOptions();
       renderSchedule();
     }
 
     function renderStats() {
       const total = courses.length;
+      const completed = activeCompletedSet();
       const doneCourses = courses.filter(course => done.has(course.code));
-      const pending = courses.filter(course => !done.has(course.code));
-      const open = pending.filter(isOpen);
-      const blocked = pending.filter(course => !isOpen(course));
+      const pending = courses.filter(course => !completed.has(course.code));
+      const open = pending.filter(course => isOpen(course, completed));
+      const blocked = pending.filter(course => !isOpen(course, completed));
       const hours = doneCourses.reduce((sum, course) => sum + course.hours, 0);
       const percent = Math.round((doneCourses.length / total) * 100);
 
@@ -1106,10 +1290,11 @@
     }
 
     function renderSide() {
+      const completed = activeCompletedSet();
       const nextList = document.getElementById("next-list");
       const chainList = document.getElementById("chain-list");
       const next = courses
-        .filter(course => !done.has(course.code) && isOpen(course))
+        .filter(course => !completed.has(course.code) && isOpen(course, completed))
         .sort((a, b) => a.period - b.period || a.code.localeCompare(b.code))
         .slice(0, 8);
 
@@ -1129,11 +1314,20 @@
         .join("");
     }
 
+    function renderSemesterOptions() {
+      const select = document.getElementById("semester-select");
+      select.innerHTML = schedule.semesterIds
+        .map(semesterId => `<option value="${semesterId}">${semesterLabel(semesterId)}</option>`)
+        .join("");
+      select.value = schedule.activeSemester;
+    }
+
     function renderScheduleCourseOptions() {
       const select = document.getElementById("schedule-course");
       const current = select.value;
+      const completed = activeCompletedSet();
       const pendingOpen = courses
-        .filter(course => !done.has(course.code) && isOpen(course))
+        .filter(course => !completed.has(course.code) && isOpen(course, completed))
         .sort((a, b) => a.period - b.period || a.code.localeCompare(b.code));
       const rest = courses
         .filter(course => !pendingOpen.includes(course))
@@ -1149,8 +1343,19 @@
     }
 
     function renderSchedule() {
-      const selectedSet = new Set(schedule.selected);
+      const filter = document.getElementById("filter").value;
+      const dayFilter = document.getElementById("day-filter");
+      const completed = activeCompletedSet();
+      const activeSelection = schedule.semesterSelections[schedule.activeSemester] || [];
+      const selectedSet = new Set(activeSelection);
       const selectedOfferings = schedule.offerings.filter(offering => selectedSet.has(offering.id));
+      const baseOfferings = schedule.offerings.filter(offering => matchesFilter(byCode[offering.code], filter, completed));
+      const availableDays = days.filter(day => baseOfferings.some(offering => offering.meetings.some(meeting => meeting.day === day.key)));
+      const activeDay = availableDays.some(day => day.key === renderSchedule.activeDay) ? renderSchedule.activeDay : "all";
+      renderSchedule.activeDay = activeDay;
+      const visibleOfferings = activeDay === "all"
+        ? baseOfferings
+        : baseOfferings.filter(offering => offering.meetings.some(meeting => meeting.day === activeDay));
       const allConflicts = selectedOfferings.flatMap(offering => conflictsFor(offering, selectedOfferings));
       const conflictIds = new Set(allConflicts.map(offering => offering.id));
       const offeringList = document.getElementById("offering-list");
@@ -1159,9 +1364,15 @@
       document.getElementById("selected-count").textContent = selectedOfferings.length;
       document.getElementById("selected-hours").textContent = `${selectedHours}h`;
       document.getElementById("conflict-count").textContent = conflictIds.size;
+      dayFilter.innerHTML = availableDays.length
+        ? [
+          `<button type="button" data-day-filter="all" class="${activeDay === "all" ? "active" : ""}">Todos</button>`,
+          ...availableDays.map(day => `<button type="button" data-day-filter="${day.key}" class="${activeDay === day.key ? "active" : ""}">${day.label}</button>`)
+        ].join("")
+        : "";
 
-      offeringList.innerHTML = schedule.offerings.length
-        ? schedule.offerings.map(offering => {
+      offeringList.innerHTML = visibleOfferings.length
+        ? visibleOfferings.map(offering => {
           const selected = selectedSet.has(offering.id);
           const conflicts = conflictsFor(offering, selectedOfferings);
           const disabled = conflicts.length && !selected;
@@ -1179,14 +1390,24 @@
             </div>
           `;
         }).join("")
-        : `<div class="empty">Nenhuma opção cadastrada ainda.</div>`;
+        : `<div class="empty">${schedule.offerings.length ? "Nenhuma opção cadastrada corresponde ao filtro atual." : "Nenhuma opção cadastrada ainda."}</div>`;
 
       document.querySelectorAll("[data-offering]").forEach(input => {
         input.addEventListener("change", event => {
           const id = event.target.dataset.offering;
-          if (event.target.checked) schedule.selected.push(id);
-          else schedule.selected = schedule.selected.filter(selectedId => selectedId !== id);
+          const selection = schedule.semesterSelections[schedule.activeSemester] || [];
+          if (event.target.checked && !selection.includes(id)) selection.push(id);
+          schedule.semesterSelections[schedule.activeSemester] = event.target.checked
+            ? selection
+            : selection.filter(selectedId => selectedId !== id);
           saveSchedule();
+          renderSchedule();
+        });
+      });
+
+      document.querySelectorAll("[data-day-filter]").forEach(button => {
+        button.addEventListener("click", event => {
+          renderSchedule.activeDay = event.target.dataset.dayFilter;
           renderSchedule();
         });
       });
@@ -1195,7 +1416,9 @@
         button.addEventListener("click", event => {
           const id = event.target.dataset.removeOffering;
           schedule.offerings = schedule.offerings.filter(offering => offering.id !== id);
-          schedule.selected = schedule.selected.filter(selectedId => selectedId !== id);
+          schedule.semesterIds.forEach(semesterId => {
+            schedule.semesterSelections[semesterId] = (schedule.semesterSelections[semesterId] || []).filter(selectedId => selectedId !== id);
+          });
           saveSchedule();
           renderSchedule();
         });
@@ -1237,6 +1460,22 @@
     }
 
     document.getElementById("filter").addEventListener("change", render);
+    document.getElementById("semester-select").addEventListener("change", event => {
+      schedule.activeSemester = event.target.value;
+      if (!schedule.semesterSelections[schedule.activeSemester]) schedule.semesterSelections[schedule.activeSemester] = [];
+      saveSchedule();
+      render();
+    });
+    document.getElementById("add-semester").addEventListener("click", () => {
+      const lastSemester = schedule.semesterIds[schedule.semesterIds.length - 1] || defaultSemesterId;
+      const nextSemester = nextSemesterId(lastSemester);
+      schedule.semesterIds = normalizeSemesterIds([...schedule.semesterIds, nextSemester]);
+      schedule.activeSemester = nextSemester;
+      if (!schedule.semesterSelections[nextSemester]) schedule.semesterSelections[nextSemester] = [];
+      saveSchedule();
+      render();
+      setStatus(`Semestre ${semesterLabel(nextSemester)} adicionado à previsão.`);
+    });
     document.getElementById("reset").addEventListener("click", () => {
       done = new Set();
       save();
@@ -1258,7 +1497,7 @@
       link.click();
       link.remove();
       URL.revokeObjectURL(link.href);
-      setStatus("Progresso exportado em JSON.");
+      setStatus("Progresso e simulação exportados em JSON.");
     });
     document.getElementById("import-progress").addEventListener("change", event => {
       const file = event.target.files[0];
@@ -1271,15 +1510,23 @@
           const imported = normalizeCodes(payload.done);
           done = new Set(imported);
           if (payload.schedule && Array.isArray(payload.schedule.offerings)) {
+            const semesterSelections = normalizeSemesterSelections(payload.schedule.semesterSelections);
+            const semesterIds = normalizeSemesterIds(payload.schedule.semesterIds || Object.keys(semesterSelections));
+            if (!semesterSelections[defaultSemesterId]) {
+              semesterSelections[defaultSemesterId] = Array.isArray(payload.schedule.selected) ? payload.schedule.selected.map(String) : [];
+            }
             schedule = {
               offerings: payload.schedule.offerings.filter(isValidOffering),
-              selected: Array.isArray(payload.schedule.selected) ? payload.schedule.selected.map(String) : []
+              selected: Array.isArray(payload.schedule.selected) ? payload.schedule.selected.map(String) : [],
+              semesterIds,
+              activeSemester: semesterIds.includes(payload.schedule.activeSemester) ? payload.schedule.activeSemester : defaultSemesterId,
+              semesterSelections
             };
             saveSchedule();
           }
           save();
           render();
-          setStatus(`${imported.length} disciplinas importadas.`);
+          setStatus(`${imported.length} disciplinas importadas${payload.schedule ? " com simulação" : ""}.`);
         } catch {
           setStatus("Não consegui ler esse arquivo de progresso.");
         } finally {
@@ -1320,9 +1567,15 @@
       renderSchedule();
     });
     document.getElementById("clear-schedule").addEventListener("click", () => {
-      schedule = { offerings: [], selected: [] };
+      schedule = {
+        offerings: [],
+        selected: [],
+        semesterIds: [defaultSemesterId],
+        activeSemester: defaultSemesterId,
+        semesterSelections: { [defaultSemesterId]: [] }
+      };
       saveSchedule();
-      renderSchedule();
+      render();
       setStatus("Simulador limpo.");
     });
 
