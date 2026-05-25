@@ -510,6 +510,43 @@
       width: fit-content;
     }
 
+    .course-manager {
+      border: 1px solid #f1d6e1;
+      border-radius: 7px;
+      padding: 9px;
+      background: #fff8fb;
+      display: grid;
+      gap: 8px;
+    }
+
+    .course-manager-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 48px auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .course-manager input[type="color"] {
+      min-height: 38px;
+      padding: 3px;
+    }
+
+    .course-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .course-chip {
+      border: 1px solid var(--origin-line, #e5bfd0);
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: var(--origin-chip-bg, #fff);
+      color: var(--origin-ink, var(--muted));
+      font-size: 11px;
+      font-weight: 700;
+    }
+
     .day-filter {
       display: flex;
       flex-wrap: wrap;
@@ -550,9 +587,19 @@
       font-size: 13px;
     }
 
+    .offering.custom-origin {
+      background: var(--origin-bg, #fff8fb);
+      border-color: var(--origin-line, #f1d6e1);
+    }
+
     .offering.conflict {
       background: #fff2f4;
       border-color: #e9a3b0;
+    }
+
+    .offering.custom-origin.conflict {
+      background: var(--origin-conflict-bg, #fff2f4);
+      border-color: var(--origin-conflict-line, #e9a3b0);
     }
 
     .offering.farmacia {
@@ -586,6 +633,12 @@
       color: var(--muted);
       font-size: 11px;
       font-weight: 700;
+    }
+
+    .course-origin.custom-origin {
+      border-color: var(--origin-line, #e5bfd0);
+      color: var(--origin-ink, var(--muted));
+      background: var(--origin-chip-bg, #fff);
     }
 
     .course-origin.farmacia {
@@ -679,10 +732,22 @@
       z-index: 1;
     }
 
+    .slot-block.custom-origin {
+      border-color: var(--origin-line, rgba(157, 59, 120, .35));
+      background: var(--origin-bg, rgba(196, 63, 127, .14));
+      color: var(--origin-ink, #64254f);
+    }
+
     .slot-block.conflict {
       border-color: rgba(185, 49, 82, .55);
       background: rgba(185, 49, 82, .14);
       color: #84213a;
+    }
+
+    .slot-block.custom-origin.conflict {
+      border-color: var(--origin-conflict-line, rgba(185, 49, 82, .55));
+      background: var(--origin-conflict-bg, rgba(185, 49, 82, .14));
+      color: var(--origin-conflict-ink, #84213a);
     }
 
     .slot-block.farmacia {
@@ -734,6 +799,12 @@
       .remove-meeting,
       .add-meeting {
         width: 100%;
+      }
+      .course-manager-row {
+        grid-template-columns: minmax(0, 1fr) 48px;
+      }
+      .course-manager-row button {
+        grid-column: 1 / -1;
       }
     }
   </style>
@@ -823,10 +894,21 @@
               </div>
               <div class="field">
                 <label for="schedule-origin">Curso</label>
-                <select id="schedule-origin">
-                  <option value="biomedicina" selected>Biomedicina</option>
-                  <option value="farmacia">Farmácia</option>
-                </select>
+                <select id="schedule-origin"></select>
+              </div>
+              <div class="course-manager">
+                <div class="course-manager-row">
+                  <div class="field">
+                    <label for="new-origin-name">Novo curso</label>
+                    <input id="new-origin-name" type="text" placeholder="Medicina, Odonto...">
+                  </div>
+                  <div class="field">
+                    <label for="new-origin-color">Cor</label>
+                    <input id="new-origin-color" type="color" value="#6f8f3a">
+                  </div>
+                  <button id="add-origin" type="button">Adicionar curso</button>
+                </div>
+                <div class="course-chip-list" id="course-chip-list"></div>
               </div>
               <div class="field">
                 <label for="schedule-label">Turma ou observação</label>
@@ -952,10 +1034,10 @@
     const scheduleSeedVersion = "pdf-pages-11-12-v2";
     const defaultSemesterId = "2026-02";
     const validCodes = new Set(courses.map(course => course.code));
-    const originLabels = {
-      biomedicina: "Biomedicina",
-      farmacia: "Farmácia"
-    };
+    const defaultOriginCatalog = [
+      { id: "biomedicina", label: "Biomedicina", color: "#9d3b78" },
+      { id: "farmacia", label: "Farmácia", color: "#57a2be" }
+    ];
     const days = [
       { key: "seg", label: "Seg" },
       { key: "ter", label: "Ter" },
@@ -1041,6 +1123,7 @@
       { id: "foto-p8-ACT072-PBNB", code: "ACT072", label: "PDF p. 12 - 8º período - TBN + PBNB", meetings: [{ day: "qui", start: 1140, end: 1240 }, { day: "qui", start: 1255, end: 1305 }] },
       { id: "foto-p8-ACT082", code: "ACT082", label: "PDF p. 12 - 8º período - TBN", meetings: [{ day: "sex", start: 1140, end: 1240 }] }
     ];
+    let originCatalog = readOriginCatalog();
     let done = new Set(readInitialProgress());
     let schedule = seedPhotoSchedule(readSchedule());
 
@@ -1081,12 +1164,104 @@
       return selections;
     }
 
+    function slugifyOrigin(value) {
+      return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+    }
+
+    function normalizeColor(value, fallback = "#6f8f3a") {
+      return /^#[0-9a-f]{6}$/i.test(String(value || "")) ? String(value).toLowerCase() : fallback;
+    }
+
+    function hexToRgb(hex) {
+      const clean = normalizeColor(hex).slice(1);
+      return {
+        r: parseInt(clean.slice(0, 2), 16),
+        g: parseInt(clean.slice(2, 4), 16),
+        b: parseInt(clean.slice(4, 6), 16)
+      };
+    }
+
+    function rgba(hex, alpha) {
+      const { r, g, b } = hexToRgb(hex);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function readableInk(hex) {
+      const { r, g, b } = hexToRgb(hex);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.58 ? "#331824" : hex;
+    }
+
+    function normalizeOriginCatalog(catalog, offerings = []) {
+      const normalized = new Map(defaultOriginCatalog.map(origin => [
+        origin.id,
+        { ...origin, color: normalizeColor(origin.color) }
+      ]));
+
+      if (Array.isArray(catalog)) {
+        catalog.forEach(origin => {
+          const label = String(origin?.label || "").trim();
+          const id = slugifyOrigin(origin?.id || label);
+          if (!id || !label) return;
+          normalized.set(id, { id, label, color: normalizeColor(origin.color) });
+        });
+      }
+
+      offerings.forEach(offering => {
+        const id = slugifyOrigin(offering?.course);
+        if (id && !normalized.has(id)) {
+          normalized.set(id, { id, label: id.replace(/-/g, " "), color: "#6f8f3a" });
+        }
+      });
+
+      return [...normalized.values()];
+    }
+
+    function readOriginCatalog() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(scheduleStoreKey) || "{}");
+        return normalizeOriginCatalog(parsed.origins, parsed.offerings);
+      } catch {
+        return normalizeOriginCatalog();
+      }
+    }
+
+    function saveOriginCatalog() {
+      saveSchedule();
+    }
+
+    function originInfo(value) {
+      const id = slugifyOrigin(value) || "biomedicina";
+      return originCatalog.find(origin => origin.id === id) ||
+        originCatalog.find(origin => origin.id === "biomedicina") ||
+        defaultOriginCatalog[0];
+    }
+
     function normalizeOrigin(value) {
-      return value === "farmacia" ? "farmacia" : "biomedicina";
+      return originInfo(value).id;
     }
 
     function originLabel(value) {
-      return originLabels[normalizeOrigin(value)];
+      return originInfo(value).label;
+    }
+
+    function originStyle(value) {
+      const origin = originInfo(value);
+      const ink = readableInk(origin.color);
+      return [
+        `--origin-bg: ${rgba(origin.color, .12)}`,
+        `--origin-line: ${rgba(origin.color, .48)}`,
+        `--origin-ink: ${ink}`,
+        `--origin-chip-bg: ${rgba(origin.color, .08)}`,
+        `--origin-conflict-bg: ${rgba(origin.color, .08)}`,
+        `--origin-conflict-line: rgba(185, 103, 49, .55)`,
+        `--origin-conflict-ink: #7f3d20`
+      ].join("; ");
     }
 
     function normalizedOffering(offering) {
@@ -1153,7 +1328,8 @@
           selected: semesterSelections[activeSemester] || [],
           semesterIds,
           activeSemester,
-          semesterSelections
+          semesterSelections,
+          origins: originCatalog
         };
       } catch {
         return {
@@ -1161,7 +1337,8 @@
           selected: [],
           semesterIds: [defaultSemesterId],
           activeSemester: defaultSemesterId,
-          semesterSelections: { [defaultSemesterId]: [] }
+          semesterSelections: { [defaultSemesterId]: [] },
+          origins: originCatalog
         };
       }
     }
@@ -1188,6 +1365,7 @@
         schedule.semesterSelections[semesterId] = (schedule.semesterSelections[semesterId] || []).filter(id => selectedIds.has(id));
       });
       schedule.selected = schedule.semesterSelections[schedule.activeSemester] || [];
+      schedule.origins = originCatalog;
       localStorage.setItem(scheduleStoreKey, JSON.stringify(schedule));
     }
 
@@ -1202,7 +1380,8 @@
         selected: currentSchedule.selected.filter(id => !id.startsWith("foto-")),
         semesterIds: currentSchedule.semesterIds,
         activeSemester: currentSchedule.activeSemester,
-        semesterSelections: currentSchedule.semesterSelections
+        semesterSelections: currentSchedule.semesterSelections,
+        origins: originCatalog
       };
       localStorage.setItem(scheduleSeedKey, scheduleSeedVersion);
       localStorage.setItem(scheduleStoreKey, JSON.stringify(seeded));
@@ -1233,7 +1412,8 @@
         selected: semesterSelections[schedule.activeSemester] || [],
         semesterIds,
         activeSemester: semesterIds.includes(schedule.activeSemester) ? schedule.activeSemester : defaultSemesterId,
-        semesterSelections
+        semesterSelections,
+        origins: originCatalog
       };
     }
 
@@ -1441,6 +1621,7 @@
       renderSide();
       renderSemesterOptions();
       renderScheduleCourseOptions();
+      renderOriginOptions();
       renderSchedule();
     }
 
@@ -1514,6 +1695,19 @@
       if (current && validCodes.has(current)) select.value = current;
     }
 
+    function renderOriginOptions() {
+      const select = document.getElementById("schedule-origin");
+      const current = select.value || "biomedicina";
+      const chipList = document.getElementById("course-chip-list");
+      select.innerHTML = originCatalog
+        .map(origin => `<option value="${origin.id}">${origin.label}</option>`)
+        .join("");
+      select.value = originCatalog.some(origin => origin.id === current) ? current : "biomedicina";
+      chipList.innerHTML = originCatalog
+        .map(origin => `<span class="course-chip" style="${originStyle(origin.id)}">${origin.label}</span>`)
+        .join("");
+    }
+
     function renderSchedule() {
       const filter = document.getElementById("filter").value;
       const dayFilter = document.getElementById("day-filter");
@@ -1572,11 +1766,11 @@
           const course = byCode[offering.code];
           const normalizedCourse = normalizeOrigin(offering.course);
           return `
-            <div class="offering ${normalizedCourse} ${conflicts.length ? "conflict" : ""}">
+            <div class="offering custom-origin ${conflicts.length ? "conflict" : ""}" style="${originStyle(normalizedCourse)}">
               <input type="checkbox" data-offering="${offering.id}" ${selected ? "checked" : ""} ${disabled ? "disabled" : ""}>
               <div>
                 <strong>${offering.code} - ${offering.label || course.name}</strong>
-                <span class="course-origin ${normalizedCourse}">${originLabel(normalizedCourse)}</span>
+                <span class="course-origin custom-origin" style="${originStyle(normalizedCourse)}">${originLabel(normalizedCourse)}</span>
                 <span>${course.name}</span>
                 <span>${meetingText(offering.meetings)}</span>
                 ${conflicts.length ? `<span>Conflito com ${conflicts.map(item => item.code).join(", ")}</span>` : ""}
@@ -1646,7 +1840,8 @@
           if (dayIndex < 0 || rowEnd <= 2 || rowStart >= rows + 2) return;
           const block = document.createElement("div");
           const normalizedCourse = normalizeOrigin(offering.course);
-          block.className = `slot-block ${normalizedCourse} ${conflictIds.has(offering.id) ? "conflict" : ""}`;
+          block.className = `slot-block custom-origin ${conflictIds.has(offering.id) ? "conflict" : ""}`;
+          block.setAttribute("style", originStyle(normalizedCourse));
           block.style.gridColumn = String(dayIndex + 2);
           block.style.gridRow = `${rowStart} / ${rowEnd}`;
           block.innerHTML = `<strong>${offering.code}</strong><br>${originLabel(normalizedCourse)}<br>${offering.label || byCode[offering.code].name}<br>${formatTime(meeting.start)}-${formatTime(meeting.end)}`;
@@ -1706,6 +1901,7 @@
           const imported = normalizeCodes(payload.done);
           done = new Set(imported);
           if (payload.schedule && Array.isArray(payload.schedule.offerings)) {
+            originCatalog = normalizeOriginCatalog(payload.schedule.origins, payload.schedule.offerings);
             const semesterSelections = normalizeSemesterSelections(payload.schedule.semesterSelections);
             const semesterIds = normalizeSemesterIds(payload.schedule.semesterIds || Object.keys(semesterSelections));
             if (!semesterSelections[defaultSemesterId]) {
@@ -1716,7 +1912,8 @@
               selected: Array.isArray(payload.schedule.selected) ? payload.schedule.selected.map(String) : [],
               semesterIds,
               activeSemester: semesterIds.includes(payload.schedule.activeSemester) ? payload.schedule.activeSemester : defaultSemesterId,
-              semesterSelections
+              semesterSelections,
+              origins: originCatalog
             };
             saveSchedule();
           }
@@ -1747,6 +1944,27 @@
       if (!event.target.matches("[data-remove-meeting]")) return;
       event.target.closest(".meeting-row").remove();
       updateMeetingRemoveButtons();
+    });
+    document.getElementById("add-origin").addEventListener("click", () => {
+      const input = document.getElementById("new-origin-name");
+      const colorInput = document.getElementById("new-origin-color");
+      const label = input.value.trim();
+      const id = slugifyOrigin(label);
+      if (!id) {
+        setStatus("Informe o nome do curso.");
+        return;
+      }
+      if (originCatalog.some(origin => origin.id === id)) {
+        setStatus("Esse curso já está cadastrado.");
+        document.getElementById("schedule-origin").value = id;
+        return;
+      }
+      originCatalog.push({ id, label, color: normalizeColor(colorInput.value) });
+      saveOriginCatalog();
+      renderOriginOptions();
+      document.getElementById("schedule-origin").value = id;
+      input.value = "";
+      setStatus(`Curso ${label} cadastrado.`);
     });
     document.getElementById("add-offering").addEventListener("click", () => {
       const code = document.getElementById("schedule-course").value;
