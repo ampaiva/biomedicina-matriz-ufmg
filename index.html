@@ -1528,6 +1528,27 @@
       const visibleOfferings = activeDay === "all"
         ? baseOfferings
         : baseOfferings.filter(offering => offering.meetings.some(meeting => meeting.day === activeDay));
+      const sortedOfferings = [...visibleOfferings].sort((a, b) => {
+        const aCourse = byCode[a.code];
+        const bCourse = byCode[b.code];
+        const aSelected = selectedSet.has(a.id);
+        const bSelected = selectedSet.has(b.id);
+        const aConflicts = conflictsFor(a, selectedOfferings).length > 0;
+        const bConflicts = conflictsFor(b, selectedOfferings).length > 0;
+        const aOpen = aCourse && !completed.has(a.code) && isOpen(aCourse, completed);
+        const bOpen = bCourse && !completed.has(b.code) && isOpen(bCourse, completed);
+        const rank = (selected, open, conflicts) => {
+          if (selected) return 0;
+          if (open && !conflicts) return 1;
+          if (open) return 2;
+          return 3;
+        };
+        return rank(aSelected, aOpen, aConflicts) - rank(bSelected, bOpen, bConflicts) ||
+          (aCourse?.period || 99) - (bCourse?.period || 99) ||
+          a.code.localeCompare(b.code) ||
+          normalizeOrigin(a.course).localeCompare(normalizeOrigin(b.course)) ||
+          String(a.label || "").localeCompare(String(b.label || ""));
+      });
       const allConflicts = selectedOfferings.flatMap(offering => conflictsFor(offering, selectedOfferings));
       const conflictIds = new Set(allConflicts.map(offering => offering.id));
       const offeringList = document.getElementById("offering-list");
@@ -1543,8 +1564,8 @@
         ].join("")
         : "";
 
-      offeringList.innerHTML = visibleOfferings.length
-        ? visibleOfferings.map(offering => {
+      offeringList.innerHTML = sortedOfferings.length
+        ? sortedOfferings.map(offering => {
           const selected = selectedSet.has(offering.id);
           const conflicts = conflictsFor(offering, selectedOfferings);
           const disabled = conflicts.length && !selected;
