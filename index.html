@@ -513,10 +513,28 @@
     .course-manager {
       border: 1px solid #f1d6e1;
       border-radius: 7px;
-      padding: 9px;
       background: #fff8fb;
+      padding: 0;
+    }
+
+    .course-manager summary {
+      min-height: 34px;
+      padding: 7px 9px;
+      cursor: pointer;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+      list-style-position: inside;
+    }
+
+    .course-manager[open] summary {
+      border-bottom: 1px solid #f1d6e1;
+    }
+
+    .course-manager-body {
       display: grid;
       gap: 8px;
+      padding: 9px;
     }
 
     .course-manager-row {
@@ -896,20 +914,23 @@
                 <label for="schedule-origin">Curso</label>
                 <select id="schedule-origin"></select>
               </div>
-              <div class="course-manager">
-                <div class="course-manager-row">
-                  <div class="field">
-                    <label for="new-origin-name">Novo curso</label>
-                    <input id="new-origin-name" type="text" placeholder="Medicina, Odonto...">
+              <details class="course-manager">
+                <summary>Adicionar novo curso</summary>
+                <div class="course-manager-body">
+                  <div class="course-manager-row">
+                    <div class="field">
+                      <label for="new-origin-name">Nome</label>
+                      <input id="new-origin-name" type="text" placeholder="Medicina, Odonto...">
+                    </div>
+                    <div class="field">
+                      <label for="new-origin-color">Cor</label>
+                      <input id="new-origin-color" type="color" value="#6f8f3a">
+                    </div>
+                    <button id="add-origin" type="button">Adicionar curso</button>
                   </div>
-                  <div class="field">
-                    <label for="new-origin-color">Cor</label>
-                    <input id="new-origin-color" type="color" value="#6f8f3a">
-                  </div>
-                  <button id="add-origin" type="button">Adicionar curso</button>
+                  <div class="course-chip-list" id="course-chip-list"></div>
                 </div>
-                <div class="course-chip-list" id="course-chip-list"></div>
-              </div>
+              </details>
               <div class="field">
                 <label for="schedule-label">Turma ou observação</label>
                 <input id="schedule-label" type="text" placeholder="Turma A, prática, optativa...">
