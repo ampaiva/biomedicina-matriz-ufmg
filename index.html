@@ -404,10 +404,15 @@
       padding: 15px;
     }
 
+    .simulator-body > * {
+      min-width: 0;
+    }
+
     .schedule-form {
       display: grid;
       gap: 10px;
       align-content: start;
+      min-width: 0;
     }
 
     .semester-controls {
@@ -453,6 +458,7 @@
       border-radius: 7px;
       background: #fff8fb;
       padding: 0;
+      min-width: 0;
     }
 
     .manual-offering summary {
@@ -520,6 +526,16 @@
       border-color: #e9a3b0;
     }
 
+    .offering.farmacia {
+      background: #f2fbff;
+      border-color: #9bc8dc;
+    }
+
+    .offering.farmacia.conflict {
+      background: #fff6f0;
+      border-color: #dda77d;
+    }
+
     .offering strong,
     .offering span {
       display: block;
@@ -528,6 +544,25 @@
     .offering span {
       color: var(--muted);
       margin-top: 2px;
+    }
+
+    .course-origin {
+      display: inline-flex;
+      width: fit-content;
+      margin-top: 4px;
+      border: 1px solid #e5bfd0;
+      border-radius: 999px;
+      padding: 1px 7px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .course-origin.farmacia {
+      border-color: #9bc8dc;
+      color: #27657d;
+      background: #f7fdff;
     }
 
     .icon-button {
@@ -559,6 +594,8 @@
       border: 1px solid #f1d6e1;
       border-radius: 8px;
       background: #fff8fb;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch;
     }
 
     .timetable {
@@ -617,6 +654,18 @@
       border-color: rgba(185, 49, 82, .55);
       background: rgba(185, 49, 82, .14);
       color: #84213a;
+    }
+
+    .slot-block.farmacia {
+      border-color: rgba(39, 101, 125, .45);
+      background: rgba(87, 162, 190, .18);
+      color: #244f62;
+    }
+
+    .slot-block.farmacia.conflict {
+      border-color: rgba(185, 103, 49, .55);
+      background: rgba(208, 93, 114, .12);
+      color: #7f3d20;
     }
 
     @media (max-width: 1500px) {
@@ -732,6 +781,13 @@
               <div class="field">
                 <label for="schedule-course">Matéria</label>
                 <select id="schedule-course"></select>
+              </div>
+              <div class="field">
+                <label for="schedule-origin">Curso</label>
+                <select id="schedule-origin">
+                  <option value="biomedicina" selected>Biomedicina</option>
+                  <option value="farmacia">Farmácia</option>
+                </select>
               </div>
               <div class="field">
                 <label for="schedule-label">Turma ou observação</label>
@@ -856,6 +912,10 @@
     const scheduleSeedVersion = "pdf-pages-11-12-v2";
     const defaultSemesterId = "2026-02";
     const validCodes = new Set(courses.map(course => course.code));
+    const originLabels = {
+      biomedicina: "Biomedicina",
+      farmacia: "Farmácia"
+    };
     const days = [
       { key: "seg", label: "Seg" },
       { key: "ter", label: "Ter" },
@@ -981,6 +1041,21 @@
       return selections;
     }
 
+    function normalizeOrigin(value) {
+      return value === "farmacia" ? "farmacia" : "biomedicina";
+    }
+
+    function originLabel(value) {
+      return originLabels[normalizeOrigin(value)];
+    }
+
+    function normalizedOffering(offering) {
+      return {
+        ...offering,
+        course: normalizeOrigin(offering.course)
+      };
+    }
+
     function readInitialProgress() {
       const params = new URLSearchParams(window.location.search);
       const doneParam = params.get("done");
@@ -1034,7 +1109,7 @@
           semesterSelections[defaultSemesterId] = Array.isArray(parsed.selected) ? parsed.selected.map(String) : [];
         }
         return {
-          offerings: Array.isArray(parsed.offerings) ? parsed.offerings.filter(isValidOffering) : [],
+          offerings: Array.isArray(parsed.offerings) ? parsed.offerings.filter(isValidOffering).map(normalizedOffering) : [],
           selected: semesterSelections[activeSemester] || [],
           semesterIds,
           activeSemester,
@@ -1083,7 +1158,7 @@
       const existingIds = new Set(preservedOfferings.map(offering => offering.id));
       const additions = photoOfferings.filter(offering => !existingIds.has(offering.id));
       const seeded = {
-        offerings: [...preservedOfferings, ...additions],
+        offerings: [...preservedOfferings, ...additions].map(normalizedOffering),
         selected: currentSchedule.selected.filter(id => !id.startsWith("foto-")),
         semesterIds: currentSchedule.semesterIds,
         activeSemester: currentSchedule.activeSemester,
@@ -1114,7 +1189,7 @@
       });
 
       return {
-        offerings: schedule.offerings,
+        offerings: schedule.offerings.map(normalizedOffering),
         selected: semesterSelections[schedule.activeSemester] || [],
         semesterIds,
         activeSemester: semesterIds.includes(schedule.activeSemester) ? schedule.activeSemester : defaultSemesterId,
@@ -1378,11 +1453,13 @@
           const conflicts = conflictsFor(offering, selectedOfferings);
           const disabled = conflicts.length && !selected;
           const course = byCode[offering.code];
+          const normalizedCourse = normalizeOrigin(offering.course);
           return `
-            <div class="offering ${conflicts.length ? "conflict" : ""}">
+            <div class="offering ${normalizedCourse} ${conflicts.length ? "conflict" : ""}">
               <input type="checkbox" data-offering="${offering.id}" ${selected ? "checked" : ""} ${disabled ? "disabled" : ""}>
               <div>
                 <strong>${offering.code} - ${offering.label || course.name}</strong>
+                <span class="course-origin ${normalizedCourse}">${originLabel(normalizedCourse)}</span>
                 <span>${course.name}</span>
                 <span>${meetingText(offering.meetings)}</span>
                 ${conflicts.length ? `<span>Conflito com ${conflicts.map(item => item.code).join(", ")}</span>` : ""}
@@ -1451,10 +1528,11 @@
           const rowEnd = Math.min(rows, Math.ceil((meeting.end - startDay) / step)) + 2;
           if (dayIndex < 0 || rowEnd <= 2 || rowStart >= rows + 2) return;
           const block = document.createElement("div");
-          block.className = `slot-block ${conflictIds.has(offering.id) ? "conflict" : ""}`;
+          const normalizedCourse = normalizeOrigin(offering.course);
+          block.className = `slot-block ${normalizedCourse} ${conflictIds.has(offering.id) ? "conflict" : ""}`;
           block.style.gridColumn = String(dayIndex + 2);
           block.style.gridRow = `${rowStart} / ${rowEnd}`;
-          block.innerHTML = `<strong>${offering.code}</strong><br>${offering.label || byCode[offering.code].name}<br>${formatTime(meeting.start)}-${formatTime(meeting.end)}`;
+          block.innerHTML = `<strong>${offering.code}</strong><br>${originLabel(normalizedCourse)}<br>${offering.label || byCode[offering.code].name}<br>${formatTime(meeting.start)}-${formatTime(meeting.end)}`;
           timetable.appendChild(block);
         });
       });
@@ -1517,7 +1595,7 @@
               semesterSelections[defaultSemesterId] = Array.isArray(payload.schedule.selected) ? payload.schedule.selected.map(String) : [];
             }
             schedule = {
-              offerings: payload.schedule.offerings.filter(isValidOffering),
+              offerings: payload.schedule.offerings.filter(isValidOffering).map(normalizedOffering),
               selected: Array.isArray(payload.schedule.selected) ? payload.schedule.selected.map(String) : [],
               semesterIds,
               activeSemester: semesterIds.includes(payload.schedule.activeSemester) ? payload.schedule.activeSemester : defaultSemesterId,
@@ -1547,6 +1625,7 @@
     });
     document.getElementById("add-offering").addEventListener("click", () => {
       const code = document.getElementById("schedule-course").value;
+      const course = normalizeOrigin(document.getElementById("schedule-origin").value);
       const label = document.getElementById("schedule-label").value.trim();
       const meetings = parseMeetings(document.getElementById("schedule-times").value);
 
@@ -1556,8 +1635,9 @@
       }
 
       schedule.offerings.push({
-        id: `${code}-${Date.now()}`,
+        id: `${code}-${course}-${Date.now()}`,
         code,
+        course,
         label,
         meetings
       });
