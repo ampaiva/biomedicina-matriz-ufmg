@@ -481,6 +481,35 @@
       padding: 11px;
     }
 
+    .meeting-editor {
+      display: grid;
+      gap: 8px;
+    }
+
+    .meeting-row {
+      display: grid;
+      grid-template-columns: minmax(82px, .9fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+      gap: 7px;
+      align-items: end;
+    }
+
+    .meeting-row .field {
+      gap: 3px;
+    }
+
+    .meeting-row label {
+      font-size: 11px;
+    }
+
+    .remove-meeting {
+      min-width: 36px;
+      padding-inline: 8px;
+    }
+
+    .add-meeting {
+      width: fit-content;
+    }
+
     .day-filter {
       display: flex;
       flex-wrap: wrap;
@@ -696,6 +725,16 @@
       button,
       .file-button,
       .select { width: 100%; }
+      .meeting-row {
+        grid-template-columns: 1fr 1fr;
+      }
+      .meeting-row .field:first-child {
+        grid-column: 1 / -1;
+      }
+      .remove-meeting,
+      .add-meeting {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -759,7 +798,7 @@
     <section class="simulator" aria-label="Simulador de horário">
       <div class="simulator-header">
         <h2>Simulador de horário</h2>
-        <p class="subtitle">Cadastre opções de turma e selecione as combinações para ver conflitos. Use formatos como <strong>seg 19:00-20:40, qua 20:50-22:30</strong>.</p>
+        <p class="subtitle">Cadastre opções de turma e selecione as combinações para ver conflitos. Em cada opção, adicione uma linha para cada encontro semanal.</p>
         <div class="semester-controls">
           <div class="field">
             <label for="semester-select">Semestre da previsão</label>
@@ -794,9 +833,10 @@
                 <input id="schedule-label" type="text" placeholder="Turma A, prática, optativa...">
               </div>
               <div class="field">
-                <label for="schedule-times">Dias e horários</label>
-                <input id="schedule-times" type="text" placeholder="seg 19:00-20:40, qua 20:50-22:30">
-                <div class="hint">Dias aceitos: seg, ter, qua, qui, sex, sab. O simulador salva no navegador e no JSON exportado.</div>
+                <label>Dias e horários</label>
+                <div class="meeting-editor" id="meeting-editor"></div>
+                <button class="add-meeting" id="add-meeting" type="button">Adicionar outro horário</button>
+                <div class="hint">Use uma linha para cada encontro da turma. O simulador salva no navegador e no JSON exportado.</div>
               </div>
               <button id="add-offering">Adicionar opção</button>
             </div>
@@ -1242,6 +1282,62 @@
       }).filter(Boolean);
     }
 
+    function addMeetingRow(meeting = { day: "seg", start: "19:00", end: "20:40" }) {
+      const editor = document.getElementById("meeting-editor");
+      const row = document.createElement("div");
+      row.className = "meeting-row";
+      row.innerHTML = `
+        <div class="field">
+          <label>Dia</label>
+          <select data-meeting-day>
+            ${days.map(day => `<option value="${day.key}" ${meeting.day === day.key ? "selected" : ""}>${day.label}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field">
+          <label>Início</label>
+          <input data-meeting-start type="time" value="${meeting.start}">
+        </div>
+        <div class="field">
+          <label>Fim</label>
+          <input data-meeting-end type="time" value="${meeting.end}">
+        </div>
+        <button class="remove-meeting" type="button" data-remove-meeting title="Remover horário">×</button>
+      `;
+      editor.appendChild(row);
+      updateMeetingRemoveButtons();
+    }
+
+    function updateMeetingRemoveButtons() {
+      const buttons = document.querySelectorAll("[data-remove-meeting]");
+      buttons.forEach(button => {
+        button.disabled = buttons.length === 1;
+      });
+    }
+
+    function resetMeetingRows() {
+      document.getElementById("meeting-editor").innerHTML = "";
+      addMeetingRow();
+    }
+
+    function collectMeetingRows() {
+      const rows = [...document.querySelectorAll(".meeting-row")];
+      const meetings = [];
+      let hasInvalid = false;
+
+      rows.forEach(row => {
+        const day = row.querySelector("[data-meeting-day]").value;
+        const start = timeToMinutes(row.querySelector("[data-meeting-start]").value);
+        const end = timeToMinutes(row.querySelector("[data-meeting-end]").value);
+        if (!day || start === null || end === null || end <= start) {
+          hasInvalid = true;
+          return;
+        }
+        meetings.push({ day, start, end });
+      });
+
+      return { meetings, hasInvalid };
+    }
+
     function meetingText(meetings) {
       return meetings
         .map(meeting => `${meeting.day} ${formatTime(meeting.start)}-${formatTime(meeting.end)}`)
@@ -1623,14 +1719,22 @@
         window.prompt("Copie o link com progresso:", url);
       }
     });
+    document.getElementById("add-meeting").addEventListener("click", () => {
+      addMeetingRow({ day: "seg", start: "19:00", end: "20:40" });
+    });
+    document.getElementById("meeting-editor").addEventListener("click", event => {
+      if (!event.target.matches("[data-remove-meeting]")) return;
+      event.target.closest(".meeting-row").remove();
+      updateMeetingRemoveButtons();
+    });
     document.getElementById("add-offering").addEventListener("click", () => {
       const code = document.getElementById("schedule-course").value;
       const course = normalizeOrigin(document.getElementById("schedule-origin").value);
       const label = document.getElementById("schedule-label").value.trim();
-      const meetings = parseMeetings(document.getElementById("schedule-times").value);
+      const { meetings, hasInvalid } = collectMeetingRows();
 
-      if (!validCodes.has(code) || !meetings.length) {
-        setStatus("Informe uma matéria e pelo menos um horário válido.");
+      if (!validCodes.has(code) || !meetings.length || hasInvalid) {
+        setStatus("Informe uma matéria e horários com início menor que o fim.");
         return;
       }
 
@@ -1643,7 +1747,7 @@
       });
       saveSchedule();
       document.getElementById("schedule-label").value = "";
-      document.getElementById("schedule-times").value = "";
+      resetMeetingRows();
       setStatus("Opção de horário adicionada.");
       renderSchedule();
     });
@@ -1660,6 +1764,7 @@
       setStatus("Simulador limpo.");
     });
 
+    resetMeetingRows();
     render();
   </script>
 </body>
