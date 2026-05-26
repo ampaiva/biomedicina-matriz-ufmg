@@ -759,20 +759,21 @@
     }
 
     .slot-block {
-      margin: 2px;
+      position: absolute;
       border-radius: 6px;
       border: 1px solid rgba(124, 63, 88, .35);
-      background: rgba(124, 63, 88, .12);
+      background: #f0e7ea;
       color: #573246;
       padding: 5px 6px;
       font-size: 12px;
       overflow: hidden;
       z-index: 1;
+      line-height: 1.2;
     }
 
     .slot-block.custom-origin {
       border-color: var(--origin-line, rgba(124, 63, 88, .35));
-      background: var(--origin-bg, rgba(124, 63, 88, .12));
+      background: var(--origin-bg, #f0e7ea);
       color: var(--origin-ink, #573246);
     }
 
@@ -784,7 +785,7 @@
 
     .slot-block.custom-origin.conflict {
       border-color: var(--origin-conflict-line, rgba(165, 63, 79, .55));
-      background: var(--origin-conflict-bg, rgba(165, 63, 79, .12));
+      background: var(--origin-conflict-bg, #f8e4e0);
       color: var(--origin-conflict-ink, #7a2f39);
     }
 
@@ -1233,6 +1234,13 @@
       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     }
 
+    function blendWithWhite(hex, amount) {
+      const { r, g, b } = hexToRgb(hex);
+      const blend = value => Math.round(value + (255 - value) * amount);
+      const toHex = value => blend(value).toString(16).padStart(2, "0");
+      return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    }
+
     function readableInk(hex) {
       const { r, g, b } = hexToRgb(hex);
       const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
@@ -1296,11 +1304,11 @@
       const origin = originInfo(value);
       const ink = readableInk(origin.color);
       return [
-        `--origin-bg: ${rgba(origin.color, .12)}`,
+        `--origin-bg: ${blendWithWhite(origin.color, .84)}`,
         `--origin-line: ${rgba(origin.color, .48)}`,
         `--origin-ink: ${ink}`,
-        `--origin-chip-bg: ${rgba(origin.color, .08)}`,
-        `--origin-conflict-bg: ${rgba(origin.color, .08)}`,
+        `--origin-chip-bg: ${blendWithWhite(origin.color, .9)}`,
+        `--origin-conflict-bg: ${blendWithWhite(origin.color, .88)}`,
         `--origin-conflict-line: rgba(185, 103, 49, .55)`,
         `--origin-conflict-ink: #7f3d20`
       ].join("; ");
@@ -1873,6 +1881,9 @@
       const startDay = 7 * 60;
       const step = 30;
       const rows = 34;
+      const headerHeight = 34;
+      const rowHeight = 24;
+      const timeColumnWidth = 64;
       timetable.innerHTML = `<div class="time-head" style="grid-column:1;grid-row:1">Hora</div>` +
         days.map((day, index) => `<div class="day-head" style="grid-column:${index + 2};grid-row:1">${day.label}</div>`).join("");
 
@@ -1884,20 +1895,59 @@
         });
       }
 
-      selectedOfferings.forEach(offering => {
-        offering.meetings.forEach(meeting => {
-          const dayIndex = days.findIndex(day => day.key === meeting.day);
-          const rowStart = Math.max(0, Math.floor((meeting.start - startDay) / step)) + 2;
-          const rowEnd = Math.min(rows, Math.ceil((meeting.end - startDay) / step)) + 2;
-          if (dayIndex < 0 || rowEnd <= 2 || rowStart >= rows + 2) return;
+      const visibleMeetings = selectedOfferings.flatMap(offering =>
+        offering.meetings.map(meeting => ({
+          offering,
+          meeting,
+          dayIndex: days.findIndex(day => day.key === meeting.day),
+          start: Math.max(meeting.start, startDay),
+          end: Math.min(meeting.end, startDay + rows * step)
+        }))
+      ).filter(item => item.dayIndex >= 0 && item.end > item.start);
+
+      days.forEach((day, dayIndex) => {
+        const dayMeetings = visibleMeetings
+          .filter(item => item.dayIndex === dayIndex)
+          .sort((a, b) => a.start - b.start || a.end - b.end);
+        const clusters = [];
+
+        dayMeetings.forEach(item => {
+          const current = clusters[clusters.length - 1];
+          if (!current || item.start >= current.end) {
+            clusters.push({ end: item.end, items: [item] });
+          } else {
+            current.items.push(item);
+            current.end = Math.max(current.end, item.end);
+          }
+        });
+
+        clusters.forEach(cluster => {
+          const laneEnds = [];
+          cluster.items.forEach(item => {
+            let lane = laneEnds.findIndex(end => end <= item.start);
+            if (lane === -1) {
+              lane = laneEnds.length;
+              laneEnds.push(item.end);
+            } else {
+              laneEnds[lane] = item.end;
+            }
+            item.lane = lane;
+          });
+          const laneCount = laneEnds.length || 1;
+          cluster.items.forEach(item => {
+            const { offering, meeting, start, end } = item;
           const block = document.createElement("div");
           const normalizedCourse = normalizeOrigin(offering.course);
           block.className = `slot-block custom-origin ${conflictIds.has(offering.id) ? "conflict" : ""}`;
           block.setAttribute("style", originStyle(normalizedCourse));
-          block.style.gridColumn = String(dayIndex + 2);
-          block.style.gridRow = `${rowStart} / ${rowEnd}`;
+            const laneWidth = 100 / laneCount;
+            block.style.left = `calc(${timeColumnWidth}px + ((100% - ${timeColumnWidth}px) / ${days.length}) * ${dayIndex} + ((100% - ${timeColumnWidth}px) / ${days.length}) * ${item.lane / laneCount} + 2px)`;
+            block.style.top = `${headerHeight + ((start - startDay) / step) * rowHeight + 2}px`;
+            block.style.width = `calc(((100% - ${timeColumnWidth}px) / ${days.length}) * ${laneWidth / 100} - 4px)`;
+            block.style.height = `${((end - start) / step) * rowHeight - 4}px`;
           block.innerHTML = `<strong>${offering.code}</strong><br>${originLabel(normalizedCourse)}<br>${offeringLabel(offering)}<br>${formatTime(meeting.start)}-${formatTime(meeting.end)}`;
           timetable.appendChild(block);
+          });
         });
       });
     }
