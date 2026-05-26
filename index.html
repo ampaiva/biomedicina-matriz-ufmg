@@ -34,12 +34,26 @@
     }
 
     header {
-      padding: 28px clamp(16px, 3vw, 36px) 18px;
+      padding: 10px clamp(16px, 3vw, 36px);
       border-bottom: 1px solid var(--line);
       background: #fff7fa;
       position: sticky;
       top: 0;
       z-index: 10;
+    }
+
+    .top-controls summary {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      color: var(--ink);
+      font-weight: 700;
+      list-style-position: inside;
+    }
+
+    .top-controls[open] summary {
+      margin-bottom: 10px;
     }
 
     h1 {
@@ -58,7 +72,6 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-top: 18px;
       align-items: center;
     }
 
@@ -829,9 +842,9 @@
 </head>
 <body>
   <header>
-    <h1>Biomedicina UFMG</h1>
-    <p class="subtitle">Visualização da matriz curricular N-20262, percurso padrão 01-01. Marque disciplinas concluídas para ver progresso, bloqueios e próximas matérias possíveis.</p>
-    <div class="toolbar">
+    <details class="top-controls">
+      <summary>Controles</summary>
+      <div class="toolbar">
       <select class="select" id="filter">
         <option value="all">Mostrar todas</option>
         <option value="open">Só liberadas</option>
@@ -860,7 +873,8 @@
       <button id="copy-link">Copiar link com progresso</button>
       <button id="reset">Limpar marcações</button>
       <div class="status-message" id="status-message" aria-live="polite"></div>
-    </div>
+      </div>
+    </details>
   </header>
 
   <main>
