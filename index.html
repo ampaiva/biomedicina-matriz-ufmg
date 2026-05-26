@@ -1556,6 +1556,16 @@
         .join(", ");
     }
 
+    function offeringLabel(offering) {
+      const label = String(offering.label || "").trim();
+      if (!label) return byCode[offering.code]?.name || offering.code;
+      const cleanLabel = label
+        .replace(/^PDF p\.\s*\d+\s*-\s*\d+º período\s*-\s*/i, "")
+        .replace(/^PDF p\.\s*\d+\s*-\s*\d+º período\s*$/i, "")
+        .trim();
+      return cleanLabel || byCode[offering.code]?.name || offering.code;
+    }
+
     function overlaps(a, b) {
       return a.day === b.day && a.start < b.end && b.start < a.end;
     }
@@ -1801,7 +1811,7 @@
             <div class="offering custom-origin ${conflicts.length ? "conflict" : ""}" style="${originStyle(normalizedCourse)}">
               <input type="checkbox" data-offering="${offering.id}" ${selected ? "checked" : ""} ${disabled ? "disabled" : ""}>
               <div>
-                <strong>${offering.code} - ${offering.label || course.name}</strong>
+                <strong>${offering.code} - ${offeringLabel(offering)}</strong>
                 <span class="course-origin custom-origin" style="${originStyle(normalizedCourse)}">${originLabel(normalizedCourse)}</span>
                 <span>${course.name}</span>
                 <span>${meetingText(offering.meetings)}</span>
@@ -1876,7 +1886,7 @@
           block.setAttribute("style", originStyle(normalizedCourse));
           block.style.gridColumn = String(dayIndex + 2);
           block.style.gridRow = `${rowStart} / ${rowEnd}`;
-          block.innerHTML = `<strong>${offering.code}</strong><br>${originLabel(normalizedCourse)}<br>${offering.label || byCode[offering.code].name}<br>${formatTime(meeting.start)}-${formatTime(meeting.end)}`;
+          block.innerHTML = `<strong>${offering.code}</strong><br>${originLabel(normalizedCourse)}<br>${offeringLabel(offering)}<br>${formatTime(meeting.start)}-${formatTime(meeting.end)}`;
           timetable.appendChild(block);
         });
       });
